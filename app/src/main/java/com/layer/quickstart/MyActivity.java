@@ -25,6 +25,8 @@ import java.util.UUID;
 
 public class MyActivity extends Activity implements LayerChangeEventListener {
     public final static String EXTRA_MESSAGE = "com.layer.quickstart.MESSAGE";
+
+    private final String LAYER_APP_ID = "f0f8c590-53e0-11e4-a55b-f7a20000387f";     //CHANGE THIS TO YOUR APP ID
     private LayerClient layerClient;
 
     @Override
@@ -36,8 +38,7 @@ public class MyActivity extends Activity implements LayerChangeEventListener {
     }
 
     private void setupLayerclient () {
-        UUID appID = UUID.fromString("f0f8c590-53e0-11e4-a55b-f7a20000387f");
-        layerClient = LayerClient.newInstance(this, appID, "GCM ID");
+        layerClient = LayerClient.newInstance(this, UUID.fromString(LAYER_APP_ID), "GCM ID");
 
         layerClient.registerConnectionListener(new LayerConnectionListenerImpl());
         layerClient.registerAuthenticationListener(new LayerAuthenticationListenerImpl());
@@ -60,7 +61,7 @@ public class MyActivity extends Activity implements LayerChangeEventListener {
 
     private void sendLayerMessage (String txtMsg) {
         // Creates and returns a new conversation object with sample participant identifiers
-        Conversation conversation = Conversation.newInstance(Arrays.asList("000000000"));
+        Conversation conversation = Conversation.newInstance(Arrays.asList("000000000"));       //Change this to a valid USER ID on your side
 
         // Create a message part with a string of text
         MessagePart messagePart = MessagePart.newInstance("text/plain", txtMsg.getBytes());
