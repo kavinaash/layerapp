@@ -26,7 +26,8 @@ import java.util.UUID;
 public class MyActivity extends Activity implements LayerChangeEventListener {
     public final static String EXTRA_MESSAGE = "com.layer.quickstart.MESSAGE";
 
-    private final String LAYER_APP_ID = "f0f8c590-53e0-11e4-a55b-f7a20000387f";     //CHANGE THIS TO YOUR APP ID
+    private final String LAYER_APP_ID = "ENTER LAYER APP ID HERE";
+    private final String GCM_ID = "ENTER_GCM_ID_HERE";
     private LayerClient layerClient;
 
     @Override
@@ -38,10 +39,12 @@ public class MyActivity extends Activity implements LayerChangeEventListener {
     }
 
     private void setupLayerclient () {
-        layerClient = LayerClient.newInstance(this, UUID.fromString(LAYER_APP_ID), "GCM ID");
+        System.out.println("Setting up Layer Client");
+        layerClient = LayerClient.newInstance(this, UUID.fromString(LAYER_APP_ID), GCM_ID);
 
         layerClient.registerConnectionListener(new LayerConnectionListenerImpl());
         layerClient.registerAuthenticationListener(new LayerAuthenticationListenerImpl());
+        layerClient.registerEventListener(this);
 
         layerClient.connect();
     }

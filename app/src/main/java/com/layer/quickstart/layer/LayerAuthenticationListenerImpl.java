@@ -1,9 +1,6 @@
 package com.layer.quickstart.layer;
 
-import android.os.AsyncTask;
-
-import com.layer.quickstart.layer.util.LayerAuthenticationHelper;
-import com.layer.quickstart.layer.util.LayerIDServiceAuthHelper;
+import com.layer.quickstart.layer.util.LayerStagingAuthenticationAdapter;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.exceptions.LayerException;
 import com.layer.sdk.listeners.LayerAuthenticationListener;
@@ -20,12 +17,9 @@ public class LayerAuthenticationListenerImpl implements LayerAuthenticationListe
 
     @Override
     public void onAuthenticationChallenge(final LayerClient layerClient, final String nonce) {
-        final String mUserId = "1234";
-
-        //The Layer Identity Service can only be used for authentication with Staging apps
-        //You will need to implement your own backend to generate identity tokens
-        LayerAuthenticationHelper authHelper = new LayerIDServiceAuthHelper();
-        authHelper.authenticate(layerClient, "https://layer-identity-provider.herokuapp.com/identity_tokens", mUserId, nonce);
+        final String mUserId = "ENTER_USER_ID_HERE";
+        System.out.println("Nonce is: " + nonce);
+        LayerStagingAuthenticationAdapter.authenticate(layerClient, mUserId, nonce);
     }
 
     @Override
