@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.layer.quickstart" >
-
-    <uses-sdk
-        android:minSdkVersion="8"
-        android:targetSdkVersion="19" />
+    package="com.layer.quick_start_android" >
 
     <!-- Layer SDK uses these for monitoring network state and receiving GCM -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -17,9 +13,9 @@
 
     <!-- GCM permission for your app (replace [com.myapp.newstandalone] with your package name) -->
     <permission
-        android:name="com.layer.quickstart.permission.C2D_MESSAGE"
+        android:name="com.layer.quick_start_android.permission.C2D_MESSAGE"
         android:protectionLevel="signature"/>
-    <uses-permission android:name="com.layer.quickstart.permission.C2D_MESSAGE"/>
+    <uses-permission android:name="com.layer.quick_start_android.permission.C2D_MESSAGE"/>
 
     <application
         android:allowBackup="true"
@@ -27,22 +23,13 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".MyActivity"
+            android:name=".MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <activity
-            android:name=".DisplayMessageActivity"
-            android:label="@string/title_activity_display_message"
-            android:parentActivityName=".MyActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.layer.quickstart.MyActivity" />
         </activity>
 
         <!-- Layer SDK has these for monitoring network, boot, and GCM -->
@@ -58,18 +45,13 @@
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
-                <category android:name="com.layer.quickstart"/>
+                <category android:name="com.layer.quick_start_android"/>
             </intent-filter>
         </receiver>
         <service android:name="com.layer.sdk.services.GcmIntentService"/>
 
-        <!-- Listen for Layer-generated push Intents -->
-        <receiver android:name=".LayerPushReceiver" android:permission="com.layer.quickstart.permission.LAYER_PUSH">
-            <intent-filter>
-                <action android:name="com.layer.sdk.PUSH"/>
-                <category android:name="com.layer.quickstart"/>
-            </intent-filter>
-        </receiver>
+
+
     </application>
 
 </manifest>

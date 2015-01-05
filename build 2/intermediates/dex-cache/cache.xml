@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/Users/neilmehta/.gradle/caches/modules-2/files-2.1/log4j/log4j/1.2.17/5af35056b4d257e4b64b9e8069c0746e8b08629f/log4j-1.2.17.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="5af35056b4d257e4b64b9e8069c0746e8b08629f">
+        <dex dex="/Users/neilmehta/Documents/Github/quick-start-android/app/build/intermediates/pre-dexed/debug/log4j-1.2.17-31054200b217c7bef76a598ad4bbe930e155a845.jar" />
+    </item>
+    <item
+        jar="/Users/neilmehta/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-log4j12/1.7.6/6953717b9850aeb26d1b8375ca07dbd9c50eca4e/slf4j-log4j12-1.7.6.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="6953717b9850aeb26d1b8375ca07dbd9c50eca4e">
+        <dex dex="/Users/neilmehta/Documents/Github/quick-start-android/app/build/intermediates/pre-dexed/debug/slf4j-log4j12-1.7.6-25e6433dcb46480149e7bec18611662b4e17d3fc.jar" />
+    </item>
+    <item
+        jar="/Users/neilmehta/Documents/Github/quick-start-android/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/libs/internal_impl-21.0.3.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="01ec05bfbafcc07646ba813000bf2ef11742dd03">
+        <dex dex="/Users/neilmehta/Documents/Github/quick-start-android/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.3-8538539cf3f821ec4e0154d23c70ea05e273d14a.jar" />
+    </item>
+    <item
+        jar="/Users/neilmehta/Documents/Github/quick-start-android/app/build/intermediates/exploded-aar/com.layer.sdk/layer-sdk/0.8.10/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="40518c3795eeb1bf7eaff53c7b286dd8c9a13518">
+        <dex dex="/Users/neilmehta/Documents/Github/quick-start-android/app/build/intermediates/pre-dexed/debug/classes-90931b69bb44178d052a51ea83b18bccbdec5f69.jar" />
+    </item>
+    <item
+        jar="/Users/neilmehta/Documents/Github/quick-start-android/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="2c91c949a45a21cdecf26e03951e46c7beec9ad8">
+        <dex dex="/Users/neilmehta/Documents/Github/quick-start-android/app/build/intermediates/pre-dexed/debug/classes-11b9384146180d3af4cbe9a411f0e076f39f0fc3.jar" />
+    </item>
+    <item
+        jar="/Users/neilmehta/Library/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/21.0.3/support-annotations-21.0.3.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="4b74cefe1f0c1b819e7260c8627a14674e37fd35">
+        <dex dex="/Users/neilmehta/Documents/Github/quick-start-android/app/build/intermediates/pre-dexed/debug/support-annotations-21.0.3-7741ca4c2c6ec7ca60291e7d02ad8669f5b7a124.jar" />
+    </item>
+    <item
+        jar="/Users/neilmehta/Documents/Github/quick-start-android/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/6.5.87/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="95482e7c792a7c0d5a9d5461e97726bd54fe9549">
+        <dex dex="/Users/neilmehta/Documents/Github/quick-start-android/app/build/intermediates/pre-dexed/debug/classes-0c0472b9e0ad250f652d1a665e33a19a81dcdaee.jar" />
+    </item>
+    <item
+        jar="/Users/neilmehta/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.6/562424e36df3d2327e8e9301a76027fca17d54ea/slf4j-api-1.7.6.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="562424e36df3d2327e8e9301a76027fca17d54ea">
+        <dex dex="/Users/neilmehta/Documents/Github/quick-start-android/app/build/intermediates/pre-dexed/debug/slf4j-api-1.7.6-c2fcbbce12056f186d36743dd0546b14b97e2035.jar" />
+    </item>
+    <item
+        jar="/Users/neilmehta/Documents/Github/quick-start-android/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/21.0.3/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="81d42bf983a8741f4888a6e333e454e4a5e0eeb7">
+        <dex dex="/Users/neilmehta/Documents/Github/quick-start-android/app/build/intermediates/pre-dexed/debug/classes-5e947ec8a0944046e951ded2f7c1d4fee4253b4f.jar" />
+    </item>
+
+</items>

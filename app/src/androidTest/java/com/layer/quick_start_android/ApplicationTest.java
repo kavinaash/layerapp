@@ -1,4 +1,4 @@
-package com.layer.quickstart;
+package com.layer.quick_start_android;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
