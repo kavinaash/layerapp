@@ -1,5 +1,6 @@
 package com.layer.quick_start_android;
 
+import android.graphics.Typeface;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -24,6 +25,7 @@ public class MessageView {
         myParent = parent;
 
         senderTV = new TextView(parent.getContext());
+        senderTV.setTypeface(null, Typeface.ITALIC);
         myParent.addView(senderTV);
 
         messageTV = new TextView(parent.getContext());
@@ -46,12 +48,10 @@ public class MessageView {
             senderTxt += " @ " + new SimpleDateFormat("HH:mm:ss").format(msg.getReceivedAt());
         }
 
-        if(msg.getSentByUserId() == MainActivity.getParticipantUserID()){
+        if(msg.getSentByUserId() != MainActivity.getUserID()){
             senderTxt += " - Read";
-        } else if (msg.getRecipientStatus(MainActivity.getParticipantUserID()) == null) {
-            senderTxt += " - Sent";
         } else {
-           switch(msg.getRecipientStatus(MainActivity.getParticipantUserID())){
+           switch(getMessageStatus(msg)){
                case PENDING:
                    senderTxt += " - Pending";
                    break;
@@ -67,12 +67,28 @@ public class MessageView {
                case READ:
                    senderTxt += " - Read";
                    break;
-
-
            }
         }
 
         return senderTxt;
+    }
+
+    private Message.RecipientStatus getMessageStatus(Message msg){
+
+        Message.RecipientStatus sameStatus = Message.RecipientStatus.READ;
+        for(int i = 1; i < MainActivity.getAllParticipants().size(); i++){
+            String firstParticipant = MainActivity.getAllParticipants().get(i-1);
+            String secondParticipant = MainActivity.getAllParticipants().get(i);
+            if(msg.getRecipientStatus(firstParticipant) != msg.getRecipientStatus(secondParticipant)) {
+                if(msg.isSent())
+                    return Message.RecipientStatus.SENT;
+                return Message.RecipientStatus.PENDING;
+            }
+
+            sameStatus = msg.getRecipientStatus(firstParticipant);
+        }
+
+        return sameStatus;
     }
 
     private String craftMsgText(Message msg){

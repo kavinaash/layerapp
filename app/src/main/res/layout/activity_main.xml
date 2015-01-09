@@ -24,8 +24,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:background="#ffedfff6">
+            android:weightSum="1">
 
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="63dp"
+                android:id="@+id/imageView"
+                android:src="@drawable/layer_logo_app"
+                android:visibility="visible"
+                android:layout_weight="0.17" />
         </LinearLayout>
 
         <ScrollView
@@ -49,7 +56,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/typingIndicator" />
+                android:id="@+id/typingIndicator"
+                android:textStyle="italic" />
 
             <LinearLayout
                 android:orientation="horizontal"
