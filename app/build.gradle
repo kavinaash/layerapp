@@ -34,7 +34,7 @@ dependencies {
     /* 1: Use the following line to refer to a locally-built JAR, e.g. `gradle fatJarDebug` */
     // compile files('../../layer-android-sdk/sdk/build/libs/sdk-0.8.11.jar')
     /* 2: Use the following line to refer to a maven JAR */
-    //compile "com.layer.sdk:layer-sdk:0.8.9@jar"
-    compile "com.google.android.gms:play-services-base:6.5.+"
-    compile "org.slf4j:slf4j-log4j12:1.7.6"
+    ////compile "com.layer.sdk:layer-sdk:0.8.9@jar"
+    //compile "com.google.android.gms:play-services-base:6.5.+"
+    //compile "org.slf4j:slf4j-log4j12:1.7.6"
 }
