@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 
 import com.layer.sdk.LayerClient;
 
@@ -15,9 +14,8 @@ import java.util.UUID;
 
 public class MainActivity extends ActionBarActivity {
 
-    public static String LayerAppIDString = "145aade4-947f-11e4-a86f-fcf2000075a4";
-    public static String GoogleCloudMessagingID = "GCM ID";
-
+    //Replace this with your App ID from the Layer Dashboard: http://developer.layer.com
+    public static String LayerAppIDString = "LAYER_APP_ID";
 
     private LayerClient layerClient;
     private ConversationViewController conversation;
@@ -28,14 +26,10 @@ public class MainActivity extends ActionBarActivity {
 
         if(layerClient == null)
             setContentView(R.layout.activity_loading);
-
-        System.out.println("onCreate");
     }
 
     protected void onResume(){
         super.onResume();
-
-        System.out.println("onResume");
 
         loadLayerClient();
 
@@ -51,7 +45,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void loadLayerClient(){
-        System.out.println("Starting loading");
 
         // Check if Sample App is using a valid app ID.
         if (isValidAppID()) {
@@ -59,30 +52,20 @@ public class MainActivity extends ActionBarActivity {
             if(layerClient == null){
                 // Initializes a LYRClient object
                 UUID appID = UUID.fromString(LayerAppIDString);
-                layerClient = LayerClient.newInstance(this, appID, GoogleCloudMessagingID);
+                layerClient = LayerClient.newInstance(this, appID, "");
 
                 //Register the connection and authentication listeners
                 layerClient.registerConnectionListener(new MyConnectionListener(this));
                 layerClient.registerAuthenticationListener(new MyAuthenticationListener(this));
-
-                //Log.v("TAG", "Registered listeners");
-                System.out.println("Registered Listeners");
-
-                //Log.v("TAG", "Created Layer client");
-                System.out.println("Created layer client");
             }
 
             if(!layerClient.isConnected()) {
                 // Asks the LayerSDK to establish a network connection with the Layer service
                 layerClient.connect();
 
-                System.out.println("Connecting...");
-                //Log.v("TAG", "Connecting...");
             } else if (!layerClient.isAuthenticated()) {
-                System.out.println("Authenticating...");
                 layerClient.authenticate();
             } else {
-                System.out.println("Launching...");
                 onUserAuthenticated();
             }
         }
@@ -125,13 +108,14 @@ public class MainActivity extends ActionBarActivity {
 
     //Once the user has successfully authenticated, begin the conversation
     public void onUserAuthenticated(){
-        setContentView(R.layout.activity_main);
 
-        Log.v("TAG", "Creating new conversation");
-        conversation = new ConversationViewController(this, layerClient);
+        if(conversation == null) {
 
-        if(layerClient != null && conversation != null) {
-            layerClient.registerTypingIndicator(conversation);
+            conversation = new ConversationViewController(this, layerClient);
+
+            if (layerClient != null) {
+                layerClient.registerTypingIndicator(conversation);
+            }
         }
     }
 }

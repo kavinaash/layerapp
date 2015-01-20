@@ -1,5 +1,6 @@
 package com.layer.quick_start_android;
 
+import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -21,8 +22,11 @@ import com.layer.sdk.messaging.MessagePart;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 /**
  * Created by neilmehta on 1/2/15.
@@ -36,6 +40,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
     //GUI elements
     private Button sendButton;
+    private LinearLayout topBar;
     private EditText userInput;
     private ScrollView conversationScroll;
     private LinearLayout conversationView;
@@ -55,19 +60,6 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
         //Cache off controller objects
         mainActivity = ma;
         layerClient = client;
-        activeConversation = getConversation();
-
-        //Cache off gui objects
-        sendButton = (Button) mainActivity.findViewById(R.id.send);
-        userInput = (EditText) mainActivity.findViewById(R.id.input);
-        conversationScroll = (ScrollView) mainActivity.findViewById(R.id.scrollView);
-        conversationView = (LinearLayout) mainActivity.findViewById(R.id.conversation);
-        typingIndicator = (TextView) mainActivity.findViewById(R.id.typingIndicator);
-
-        //Capture user input
-        sendButton.setOnClickListener(this);
-        userInput.setText(mainActivity.getInitialMessage());
-        userInput.addTextChangedListener(this);
 
         //When conversations/messages change, capture them
         layerClient.registerEventListener(this);
@@ -75,31 +67,48 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
         //List of users that are typing (used with LayerTypingIndicatorListener)
         typingUsers = new ArrayList<String>();
 
+        //Change the layout
+        mainActivity.setContentView(R.layout.activity_main);
+
+        //Cache off gui objects
+        sendButton = (Button) mainActivity.findViewById(R.id.send);
+        topBar = (LinearLayout)mainActivity.findViewById(R.id.topbar);
+        userInput = (EditText) mainActivity.findViewById(R.id.input);
+        conversationScroll = (ScrollView) mainActivity.findViewById(R.id.scrollView);
+        conversationView = (LinearLayout) mainActivity.findViewById(R.id.conversation);
+        typingIndicator = (TextView) mainActivity.findViewById(R.id.typingIndicator);
+
+        //Capture user input
+        sendButton.setOnClickListener(this);
+        topBar.setOnClickListener(this);
+        userInput.setText(mainActivity.getInitialMessage());
+        userInput.addTextChangedListener(this);
+
+        //If there is an active conversation between the Device, Simulator, and Dashboard (web client), cache it
+        activeConversation = getConversation();
+
         //If there is an active conversation, draw it
         drawConversation();
+
+        if(activeConversation != null)
+            getTopBarMetaData();
     }
 
     //Checks to see if there is already a conversation between the device and emulator
     private Conversation getConversation(){
-        if(activeConversation == null){
 
+        if(activeConversation == null){
             //Grab the participants and check to see if there are any conversations
             List<Conversation> allConversations = layerClient.getConversationsWithParticipants(mainActivity.getAllParticipants());
 
-            //Return the earliest conversation
-            Conversation oldest = null;
+            //Return the oldest conversation (first created)
             if(allConversations != null && allConversations.size() > 0) {
-                for(int i = 0; i < allConversations.size(); i++){
-                    if(oldest == null || allConversations.get(i).getLastMessage().getSentAt().before(oldest.getLastMessage().getSentAt()))
-                        oldest = allConversations.get(i);
-                }
-
-                return oldest;
+                return allConversations.get(0);
             }
         }
 
-        //null by default
-        return null;
+        //Returns the active conversation (which is null by default)
+        return activeConversation;
     }
 
     //Redraws the conversation window in the GUI
@@ -146,24 +155,68 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
         }
     }
 
+    private void setTopBarMetaData(float red, float green, float blue){
+        if(activeConversation != null) {
+            Map<String, Object> metadata = new HashMap<String, Object>();
+
+            Map<String, Object> colors = new HashMap<String, Object>();
+            colors.put("red", Float.toString(red));
+            colors.put("green", Float.toString(green));
+            colors.put("blue", Float.toString(blue));
+
+            metadata.put("backgroundColor", colors);
+
+            layerClient.putMetadata(activeConversation, metadata, true);
+        }
+    }
+
+    private void getTopBarMetaData(){
+        if(activeConversation != null) {
+
+            Map<String, Object> current = activeConversation.getMetadata();
+            if(current.containsKey("backgroundColor")) {
+
+                Map<String, Object> colors = (Map<String, Object>)current.get("backgroundColor");
+
+                if(colors != null) {
+
+                    float red = Float.parseFloat((String)colors.get("red"));
+                    float green = Float.parseFloat((String)colors.get("green"));
+                    float blue = Float.parseFloat((String)colors.get("blue"));
+
+                    setTopBarColor(red, green, blue);
+                }
+            }
+        }
+    }
+
+    private void setTopBarColor(float red, float green, float blue){
+        if(topBar != null) {
+            topBar.setBackgroundColor(Color.argb(255, (int)(255.0f * red), (int)(255.0f * green), (int)(255.0f * blue)));
+        }
+    }
+
     //================================================================================
     // View.OnClickListener methods
     //================================================================================
 
     public void onClick(View v) {
-        //When the "send" button is clicked,
+        //When the "send" button is clicked, grab the ongoing conversation (or create it) and send the message
         if(v == sendButton){
 
             if(activeConversation == null){
                 activeConversation = getConversation();
                 if(activeConversation == null){
                     activeConversation = Conversation.newInstance(mainActivity.getAllParticipants());
+                } else {
+                    getTopBarMetaData();
                 }
             }
 
+            //Put the user's text into a message part
             MessagePart messagePart = MessagePart.newInstance(userInput.getText().toString());
 
-            // Creates and returns a new message object with the given conversation and array of message parts
+            //Creates and returns a new message object with the given conversation and array of message parts
             Message message = Message.newInstance(activeConversation, Arrays.asList(messagePart));
 
             //Sends the specified message
@@ -171,6 +224,17 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
             //Clears the text input field
             userInput.setText("");
+        }
+
+        //When the Layer logo bar is clicked, randomly change the color and store it in the conversation's metadata
+        if(v == topBar){
+            Random r = new Random();
+            float red = r.nextFloat();
+            float green = r.nextFloat();
+            float blue = r.nextFloat();
+
+            setTopBarMetaData(red, green, blue);
+            setTopBarColor(red, green, blue);
         }
     }
 
@@ -180,15 +244,53 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
     public void onEventMainThread(LayerChangeEvent event) {
 
+        //You can choose to handle changes to conversations or messages however you'd like:
         List<LayerChange> changes = event.getChanges();
         for(int i = 0; i < changes.size(); i++){
-            if(changes.get(i).getObjectType() == LayerObject.Type.CONVERSATION && activeConversation == null){
-                activeConversation = (Conversation)changes.get(i).getObject();
+            LayerChange change = changes.get(i);
+            if(change.getObjectType() == LayerObject.Type.CONVERSATION){
+
+                Conversation conversation = (Conversation)change.getObject();
+                System.out.println("Conversation " + conversation.getId() + " attribute " + change.getAttributeName() + " was changed from " + change.getOldValue() + " to " + change.getNewValue());
+
+                switch (change.getChangeType()){
+                    case INSERT:
+                        break;
+
+                    case UPDATE:
+                        break;
+
+                    case DELETE:
+                        break;
+                }
+
+            } else if(change.getObjectType() == LayerObject.Type.MESSAGE) {
+
+                Message message = (Message)change.getObject();
+                System.out.println("Message " + message.getId() + " attribute " + change.getAttributeName() + " was changed from " + change.getOldValue() + " to " + change.getNewValue());
+
+                switch (change.getChangeType()){
+                    case INSERT:
+                        break;
+
+                    case UPDATE:
+                        break;
+
+                    case DELETE:
+                        break;
+                }
             }
         }
 
+        //If we don't have an active conversation, grab the oldest one
+        if(activeConversation == null)
+            activeConversation = getConversation();
+
         //If anything in the conversation changes, re-draw it in the GUI
         drawConversation();
+
+        //Check the meta-data for color changes
+        getTopBarMetaData();
     }
 
     //================================================================================
@@ -205,7 +307,8 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
     public void afterTextChanged(Editable s) {
         //After the user has changed some text, we notify other participants that they are typing
-        layerClient.sendTypingIndicator(activeConversation, LayerTypingIndicatorListener.TypingIndicator.STARTED);
+        if(activeConversation != null)
+            layerClient.sendTypingIndicator(activeConversation, LayerTypingIndicatorListener.TypingIndicator.STARTED);
     }
 
     //================================================================================
@@ -232,13 +335,15 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
             //No one is typing
             typingIndicator.setText("");
+
         } else if (typingUsers.size() == 1) {
 
-            //Name the one user that is typing
+            //Name the one user that is typing (and make sure the text is grammatically correct)
             typingIndicator.setText(typingUsers.get(0) + " is typing");
+
         } else if(typingUsers.size() > 1) {
 
-            //Name all the users that are typing
+            //Name all the users that are typing (and make sure the text is grammatically correct)
             String users = "";
             for(int i = 0; i < typingUsers.size(); i++){
                 users += typingUsers.get(i);
@@ -248,6 +353,5 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
             typingIndicator.setText(users + " are typing");
         }
-
     }
 }

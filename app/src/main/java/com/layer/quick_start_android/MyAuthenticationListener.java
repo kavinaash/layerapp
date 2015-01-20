@@ -54,7 +54,7 @@ public class MyAuthenticationListener implements LayerAuthenticationListener {
 
                     client.answerAuthenticationChallenge(eit);
 
-                    System.out.println("Trying to authentiate");
+                    System.out.println("Trying to authenticate");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
