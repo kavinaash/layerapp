@@ -21,15 +21,19 @@ public class MyAuthenticationListener implements LayerAuthenticationListener {
         main_activity = ma;
     }
 
-    //Called after layerClient.authenticate() executes
-    //You will need to set up an Authentication Service to take a Layer App ID, User ID, and the
-    //nonce to create a Identity Token to pass back to Layer
+    @Override
+    public void onAuthenticated(LayerClient client, String arg1) {
+        System.out.println("Authentication successful");
+        if(main_activity != null)
+            main_activity.onUserAuthenticated();
+    }
+
+    @Override
     public void onAuthenticationChallenge(final LayerClient client, final String nonce) {
         final String mUserId = MainActivity.getUserID();
 
-        //Note: This Layer Authentication Service is for TESTING PURPOSES ONLY
-        //When going into production, you will need to create your own web service
-        //Check out https://developer.layer.com/docs/guides#authentication for guidance
+        System.out.println("Challenge: " + mUserId);
+
         (new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -50,6 +54,7 @@ public class MyAuthenticationListener implements LayerAuthenticationListener {
 
                     client.answerAuthenticationChallenge(eit);
 
+                    System.out.println("Trying to authenticate");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -58,24 +63,15 @@ public class MyAuthenticationListener implements LayerAuthenticationListener {
         }).execute();
     }
 
-    //Called when the user has successfully authenticated
-    public void onAuthenticated(LayerClient client, String arg1) {
-
-        //Start the conversation view after a successful authentication
-        System.out.println("Authentication successful");
-        if(main_activity != null)
-            main_activity.onUserAuthenticated();
-    }
-
-    //Called when there was a problem authenticating
-    //Common causes include a malformed identity token, missing parameters in the identity token, missing
-    //or incorrect nonce
+    @Override
     public void onAuthenticationError(LayerClient layerClient, LayerException e) {
-        System.out.println("There was an error authenticating: " + e);
+        // TODO Auto-generated method stub
+        System.out.println("There was an error authenticating");
     }
 
-    //Called after the user has been deauthenticated
+    @Override
     public void onDeauthenticated(LayerClient client) {
+        // TODO Auto-generated method stub
         System.out.println("User is deauthenticated");
     }
 }

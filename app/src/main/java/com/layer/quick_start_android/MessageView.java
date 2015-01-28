@@ -1,7 +1,6 @@
 package com.layer.quick_start_android;
 
 import android.graphics.Typeface;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -13,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
+ * Created by neilmehta on 1/5/15.
  * Takes a Layer Message object, formats the text and attaches it to a LinearLayout
  */
 public class MessageView {
@@ -24,32 +24,18 @@ public class MessageView {
     private TextView senderTV;
     private TextView messageTV;
 
-    private ImageView statusImage;
-
-    private LinearLayout messageDetails;
-
     //Takes the Layout parent object and message
     public MessageView(LinearLayout parent, Message msg){
         myParent = parent;
 
-        //The first part of each message will include the sender and status
-        messageDetails = new LinearLayout(parent.getContext());
-        messageDetails.setOrientation(LinearLayout.HORIZONTAL);
-        myParent.addView(messageDetails);
-
         //Creates the sender text view, sets the text to be italic, and attaches it to the parent
         senderTV = new TextView(parent.getContext());
         senderTV.setTypeface(null, Typeface.ITALIC);
-        messageDetails.addView(senderTV);
+        myParent.addView(senderTV);
 
         //Creates the message text view and attaches it to the parent
         messageTV = new TextView(parent.getContext());
         myParent.addView(messageTV);
-
-        //The status is displayed with an icon, depending on whether the message has been read, delivered, or sent
-        //statusImage = new ImageView(parent.getContext());
-        statusImage = createStatusImage(msg);//statusImage.setImageResource(R.drawable.sent);
-        messageDetails.addView(statusImage);
 
         //Populates the text views
         UpdateMessage(msg);
@@ -72,51 +58,62 @@ public class MessageView {
         String senderTxt = msg.getSentByUserId();
 
         //Add the timestamp
-        if(msg.getSentAt() != null) {
+        if(msg.getReceivedAt() != null) {
             senderTxt += " @ " + new SimpleDateFormat("HH:mm:ss").format(msg.getReceivedAt());
         }
 
-        //Add some formatting before the status icon
-        senderTxt += "   ";
+        //Set the status
+        if(msg.getSentByUserId() != MainActivity.getUserID()){
+            senderTxt += " - Read";
+        } else {
+           switch(getMessageStatus(msg)){
+               case PENDING:
+                   senderTxt += " - Pending";
+                   break;
+
+               case SENT:
+                   senderTxt += " - Sent";
+                   break;
+
+               case DELIVERED:
+                   senderTxt += " - Delivered";
+                   break;
+
+               case READ:
+                   senderTxt += " - Read";
+                   break;
+           }
+        }
 
         //Return the formatted text
         return senderTxt;
     }
 
     //Checks the recipient status of the message (based on all participants)
-    private Message.RecipientStatus getMessageStatus(Message msg) {
+    private Message.RecipientStatus getMessageStatus(Message msg){
 
-        //If we didn't send the message, we already know the status - we have read it
-        if (!msg.getSentByUserId().equalsIgnoreCase(MainActivity.getUserID()))
-            return Message.RecipientStatus.READ;
+        //Assume the message has been read
+        Message.RecipientStatus msgStatus = Message.RecipientStatus.READ;
 
-        //Assume the message has been sent
-        Message.RecipientStatus status = Message.RecipientStatus.SENT;
+        //Check the status for all users
+        for(int i = 1; i < MainActivity.getAllParticipants().size(); i++){
 
-        //Go through each user to check the status, in this case we check each user and prioritize so
-        // that we return the highest status: Sent -> Delivered -> Read
-        for (int i = 0; i < MainActivity.getAllParticipants().size(); i++) {
+            //Grab the status for each participant
+            String firstParticipant = MainActivity.getAllParticipants().get(i-1);
+            String secondParticipant = MainActivity.getAllParticipants().get(i);
 
-            //Don't check the status of the current user
-            String participant = MainActivity.getAllParticipants().get(i);
-            if (participant.equalsIgnoreCase(MainActivity.getUserID()))
-                continue;
-
-            if (status == Message.RecipientStatus.SENT) {
-
-                if (msg.getRecipientStatus(participant) == Message.RecipientStatus.DELIVERED)
-                    status = Message.RecipientStatus.DELIVERED;
-
-                if (msg.getRecipientStatus(participant) == Message.RecipientStatus.READ)
-                    return Message.RecipientStatus.READ;
-
-            } else if (status == Message.RecipientStatus.DELIVERED) {
-                if (msg.getRecipientStatus(participant) == Message.RecipientStatus.READ)
-                    return Message.RecipientStatus.READ;
+            //If they have different statuses, check to see if the message has been sent or not
+            if(msg.getRecipientStatus(firstParticipant) != msg.getRecipientStatus(secondParticipant)) {
+                if(msg.isSent())
+                    return Message.RecipientStatus.SENT;
+                return Message.RecipientStatus.PENDING;
             }
+
+            msgStatus = msg.getRecipientStatus(firstParticipant);
         }
 
-        return status;
+        //If all users have the same status, return that status
+        return msgStatus;
     }
 
     //Checks the message parts and parses the message contents
@@ -130,8 +127,8 @@ public class MessageView {
         List<MessagePart> parts = msg.getMessageParts();
         for(int i = 0; i < msg.getMessageParts().size(); i++){
 
-            //You can always set the mime type when creating a message part, by default the mime type
-            // is initialized to plain text when the message part is created
+            //You can always set the mime type when creating a message part, by default it is
+            // set to plain test
             if(parts.get(i).getMimeType().equalsIgnoreCase("text/plain")) {
                 try {
                     msgText += new String(parts.get(i).getData(), "UTF-8") + "\n";
@@ -143,31 +140,5 @@ public class MessageView {
 
         //Return the assembled text
         return msgText;
-    }
-
-    //Sets the status image based on whether other users in the conversation have received or read
-    //the message
-    private ImageView createStatusImage(Message msg){
-        ImageView status = new ImageView(myParent.getContext());
-
-        switch(getMessageStatus(msg)){
-
-            case SENT:
-                status.setImageResource(R.drawable.sent);
-                break;
-
-            case DELIVERED:
-                status.setImageResource(R.drawable.delivered);
-                break;
-
-            case READ:
-                status.setImageResource(R.drawable.read);
-                break;
-        }
-
-        //Have the icon fill the space vertically
-        status.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
-
-        return status;
     }
 }
