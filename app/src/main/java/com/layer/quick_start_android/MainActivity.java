@@ -11,66 +11,98 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+/*
+ * Handles the main activity and conversationView view
+ */
 
 public class MainActivity extends ActionBarActivity {
 
-    //Replace this with your App ID from the Layer Dashboard: http://developer.layer.com
+    //Replace this with your App ID from the Layer Developer page: http://developer.layer.com
     public static String LayerAppIDString = "LAYER_APP_ID";
 
     private LayerClient layerClient;
-    private ConversationViewController conversation;
+    private ConversationViewController conversationView;
 
-    @Override
+    //Layer connection and authentication callback listeners
+    private MyConnectionListener connectionListener;
+    private MyAuthenticationListener authenticationListener;
+
+    //onCreate is called on App Start
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //If we haven't created a LayerClient, show the loading splash screen
         if(layerClient == null)
             setContentView(R.layout.activity_loading);
+
+
+        //Create the callback listeners
+
+        if(connectionListener == null)
+            connectionListener = new MyConnectionListener(this);
+
+        if(authenticationListener == null)
+            authenticationListener = new MyAuthenticationListener(this);
     }
 
+    //onResume is called on App Start and when the app is brought to the foreground
     protected void onResume(){
         super.onResume();
 
+        //Connect to Layer and Authenticate a user
         loadLayerClient();
 
-        if(layerClient != null && conversation != null)
-            layerClient.registerTypingIndicator(conversation);
+        //Every time the app is brought to the foreground, register the typing indicator
+        if(layerClient != null && conversationView != null)
+            layerClient.registerTypingIndicator(conversationView);
     }
 
+    //onPause is called when the app is sent to the background
     protected void onPause(){
         super.onPause();
 
-        if(layerClient != null && conversation != null)
-            layerClient.unregisterTypingIndicator(conversation);
+        //When the app is moved to the background, unregister the typing indicator
+        if(layerClient != null && conversationView != null)
+            layerClient.unregisterTypingIndicator(conversationView);
     }
 
+    //Checks to see if the SDK is connected to Layer and whether a user is authenticated
+    //The respective callbacks are executed in MyConnectionListener and MyAuthenticationListener
     private void loadLayerClient(){
 
         // Check if Sample App is using a valid app ID.
         if (isValidAppID()) {
 
             if(layerClient == null){
+
                 // Initializes a LYRClient object
                 UUID appID = UUID.fromString(LayerAppIDString);
                 layerClient = LayerClient.newInstance(this, appID, "");
 
                 //Register the connection and authentication listeners
-                layerClient.registerConnectionListener(new MyConnectionListener(this));
-                layerClient.registerAuthenticationListener(new MyAuthenticationListener(this));
+                layerClient.registerConnectionListener(connectionListener);
+                layerClient.registerAuthenticationListener(authenticationListener);
             }
 
             if(!layerClient.isConnected()) {
+
                 // Asks the LayerSDK to establish a network connection with the Layer service
                 layerClient.connect();
 
             } else if (!layerClient.isAuthenticated()) {
+
+                // Asks the LayerSDK to authenticate this user (either "Device" or "Simulator" is used by default)
                 layerClient.authenticate();
+
             } else {
+
+                // If connected to Layer and the user is authenticated, start the conversationView view
                 onUserAuthenticated();
             }
         }
     }
 
+    //If you haven't replaced "LAYER_APP_ID" with your App ID, send a message
     private boolean isValidAppID() {
         if(LayerAppIDString.equalsIgnoreCase("LAYER_APP_ID")) {
 
@@ -91,6 +123,7 @@ public class MainActivity extends ActionBarActivity {
         return true;
     }
 
+    //Return "Simulator" if this is an emulator, or "Device" if running on hardware
     public static String getUserID(){
         if(Build.FINGERPRINT.startsWith("generic"))
             return "Simulator";
@@ -98,23 +131,20 @@ public class MainActivity extends ActionBarActivity {
         return "Device";
     }
 
+    //By default, create a conversationView between these 3 participants
     public static List<String> getAllParticipants(){
         return Arrays.asList("Device", "Simulator", "Dashboard");
     }
 
-    public static String getInitialMessage(){
-        return "Hey, everyone! This is your friend, " + getUserID();
-    }
-
-    //Once the user has successfully authenticated, begin the conversation
+    //Once the user has successfully authenticated, begin the conversationView
     public void onUserAuthenticated(){
 
-        if(conversation == null) {
+        if(conversationView == null) {
 
-            conversation = new ConversationViewController(this, layerClient);
+            conversationView = new ConversationViewController(this, layerClient);
 
             if (layerClient != null) {
-                layerClient.registerTypingIndicator(conversation);
+                layerClient.registerTypingIndicator(conversationView);
             }
         }
     }
