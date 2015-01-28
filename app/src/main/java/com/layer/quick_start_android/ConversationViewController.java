@@ -29,11 +29,10 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * Created by neilmehta on 1/2/15.
  * Handles the conversation between the pre-defined participants (Device, Emulator) and displays
  * messages in the GUI.
  */
-public class ConversationViewController implements View.OnClickListener, LayerChangeEventListener, TextWatcher, LayerTypingIndicatorListener {
+public class ConversationViewController implements View.OnClickListener, LayerChangeEventListener.MainThread, TextWatcher, LayerTypingIndicatorListener {
 
     private MainActivity mainActivity;
     private LayerClient layerClient;
@@ -81,7 +80,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
         //Capture user input
         sendButton.setOnClickListener(this);
         topBar.setOnClickListener(this);
-        userInput.setText(mainActivity.getInitialMessage());
+        userInput.setText(getInitialMessage());
         userInput.addTextChangedListener(this);
 
         //If there is an active conversation between the Device, Simulator, and Dashboard (web client), cache it
@@ -92,6 +91,44 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
         if(activeConversation != null)
             getTopBarMetaData();
+    }
+
+    //Create a new message and send it
+    private void sendButtonClicked(){
+
+        //Check to see if there is an active conversation between the pre-defined participants
+        if(activeConversation == null){
+            activeConversation = getConversation();
+
+            //If there isn't, create a new conversation with those participants
+            if(activeConversation == null){
+                activeConversation = Conversation.newInstance(mainActivity.getAllParticipants());
+            }
+        }
+
+        //Put the user's text into a message part
+        MessagePart messagePart = MessagePart.newInstance(userInput.getText().toString());
+
+        //Creates and returns a new message object with the given conversation and array of message parts
+        Message message = Message.newInstance(activeConversation, Arrays.asList(messagePart));
+
+        //Sends the specified message
+        layerClient.sendMessage(message);
+
+        //Clears the text input field
+        userInput.setText("");
+    }
+
+    //Create a random color and apply it to the Layer logo bar
+    private void topBarClicked(){
+
+        Random r = new Random();
+        float red = r.nextFloat();
+        float green = r.nextFloat();
+        float blue = r.nextFloat();
+
+        setTopBarMetaData(red, green, blue);
+        setTopBarColor(red, green, blue);
     }
 
     //Checks to see if there is already a conversation between the device and emulator
@@ -144,6 +181,10 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
         if(msg == null)
             return;
 
+        //Once the message has been displayed, we mark it as read
+        if(!msg.getSentByUserId().equalsIgnoreCase(MainActivity.getUserID()))
+            layerClient.markMessageAsRead(msg);
+
         //Grab the message id
         String msgId = msg.getId().toString();
 
@@ -155,6 +196,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
         }
     }
 
+    //Stores RGB values in the conversation's metadata
     private void setTopBarMetaData(float red, float green, float blue){
         if(activeConversation != null) {
             Map<String, Object> metadata = new HashMap<String, Object>();
@@ -166,10 +208,12 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
             metadata.put("backgroundColor", colors);
 
+            //Merge this new information with the existing metadata
             layerClient.putMetadata(activeConversation, metadata, true);
         }
     }
 
+    //Check the conversation's metadata for RGB values
     private void getTopBarMetaData(){
         if(activeConversation != null) {
 
@@ -190,11 +234,17 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
         }
     }
 
+    //Takes RGB values and sets the top bar color
     private void setTopBarColor(float red, float green, float blue){
         if(topBar != null) {
             topBar.setBackgroundColor(Color.argb(255, (int)(255.0f * red), (int)(255.0f * green), (int)(255.0f * blue)));
         }
     }
+
+    public static String getInitialMessage(){
+        return "Hey, everyone! This is your friend, " + MainActivity.getUserID();
+    }
+
 
     //================================================================================
     // View.OnClickListener methods
@@ -203,38 +253,12 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
     public void onClick(View v) {
         //When the "send" button is clicked, grab the ongoing conversation (or create it) and send the message
         if(v == sendButton){
-
-            if(activeConversation == null){
-                activeConversation = getConversation();
-                if(activeConversation == null){
-                    activeConversation = Conversation.newInstance(mainActivity.getAllParticipants());
-                } else {
-                    getTopBarMetaData();
-                }
-            }
-
-            //Put the user's text into a message part
-            MessagePart messagePart = MessagePart.newInstance(userInput.getText().toString());
-
-            //Creates and returns a new message object with the given conversation and array of message parts
-            Message message = Message.newInstance(activeConversation, Arrays.asList(messagePart));
-
-            //Sends the specified message
-            layerClient.sendMessage(message);
-
-            //Clears the text input field
-            userInput.setText("");
+            sendButtonClicked();
         }
 
         //When the Layer logo bar is clicked, randomly change the color and store it in the conversation's metadata
         if(v == topBar){
-            Random r = new Random();
-            float red = r.nextFloat();
-            float green = r.nextFloat();
-            float blue = r.nextFloat();
-
-            setTopBarMetaData(red, green, blue);
-            setTopBarColor(red, green, blue);
+            topBarClicked();
         }
     }
 
