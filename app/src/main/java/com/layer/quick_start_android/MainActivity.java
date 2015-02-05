@@ -84,20 +84,24 @@ public class MainActivity extends ActionBarActivity {
                 layerClient.registerAuthenticationListener(authenticationListener);
             }
 
-            if(!layerClient.isConnected()) {
 
-                // Asks the LayerSDK to establish a network connection with the Layer service
-                layerClient.connect();
+            if (!layerClient.isAuthenticated()) {
 
-            } else if (!layerClient.isAuthenticated()) {
-
-                // Asks the LayerSDK to authenticate this user (either "Device" or "Simulator" is used by default)
+                //First we try to authenticate the user. if the LayerClient is not connected, "connect()"
+                //will be called automatically by the Layer SDK.
                 layerClient.authenticate();
+
+            } else if (!layerClient.isConnected()) {
+
+                //If the user is authenticated, but Layer is not connected, make sure we connect in
+                //order to send/receive messages
+                layerClient.connect();
 
             } else {
 
                 // If connected to Layer and the user is authenticated, start the conversationView view
                 onUserAuthenticated();
+
             }
         }
     }

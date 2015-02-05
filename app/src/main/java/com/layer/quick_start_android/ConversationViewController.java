@@ -129,6 +129,9 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
         setTopBarMetaData(red, green, blue);
         setTopBarColor(red, green, blue);
+
+
+
     }
 
     //Checks to see if there is already a conversation between the device and emulator
@@ -182,7 +185,8 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
             return;
 
         //Once the message has been displayed, we mark it as read
-        if(!msg.getSentByUserId().equalsIgnoreCase(MainActivity.getUserID()))
+        //NOTE: the sender of a message CANNOT mark their own message as read
+        if(!msg.getSentByUserId().equalsIgnoreCase(layerClient.getAuthenticatedUserId()))
             layerClient.markMessageAsRead(msg);
 
         //Grab the message id
