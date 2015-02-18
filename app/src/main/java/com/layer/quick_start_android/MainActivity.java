@@ -17,9 +17,15 @@ import java.util.UUID;
 
 public class MainActivity extends ActionBarActivity {
 
-    //Replace this with your App ID from the Layer Developer page: http://developer.layer.com
-    public static String LayerAppIDString = "LAYER_APP_ID";
+    //Replace this with your App ID from the Layer Developer page.
+    //Go http://developer.layer.com, click on "Dashboard" and select "Info"
+    public static String Layer_App_ID = "LAYER_APP_ID";
 
+    //Replace this with your Project Number from http://console.developers.google.com
+    public static String GCM_Project_Number = "00000";
+
+
+    //Global variables used to manage the Layer Client and the conversations in this app
     private LayerClient layerClient;
     private ConversationViewController conversationView;
 
@@ -75,9 +81,11 @@ public class MainActivity extends ActionBarActivity {
 
             if(layerClient == null){
 
+                LayerClient.setLogLevel(LayerClient.LogLevel.DETAILED);
+
                 // Initializes a LYRClient object
-                UUID appID = UUID.fromString(LayerAppIDString);
-                layerClient = LayerClient.newInstance(this, appID, "");
+                UUID appID = UUID.fromString(Layer_App_ID);
+                layerClient = LayerClient.newInstance(this, appID, GCM_Project_Number);
 
                 //Register the connection and authentication listeners
                 layerClient.registerConnectionListener(connectionListener);
@@ -108,7 +116,7 @@ public class MainActivity extends ActionBarActivity {
 
     //If you haven't replaced "LAYER_APP_ID" with your App ID, send a message
     private boolean isValidAppID() {
-        if(LayerAppIDString.equalsIgnoreCase("LAYER_APP_ID")) {
+        if(Layer_App_ID.equalsIgnoreCase("LAYER_APP_ID")) {
 
             // Instantiate an AlertDialog.Builder with its constructor
             AlertDialog.Builder builder = new AlertDialog.Builder(this);

@@ -11,7 +11,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
 
-    <!-- GCM permission for your app (replace [com.myapp.newstandalone] with your package name) -->
+    <!-- GCM permission for your app -->
     <permission
         android:name="com.layer.quick_start_android.permission.C2D_MESSAGE"
         android:protectionLevel="signature"/>
@@ -40,6 +40,7 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
+
         <receiver
             android:name="com.layer.sdk.services.GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND">
@@ -50,6 +51,16 @@
         </receiver>
         <service android:name="com.layer.sdk.services.GcmIntentService"/>
 
+        <receiver android:name=".LayerPushReceiver">
+            <intent-filter>
+                <action android:name="com.layer.sdk.PUSH"/>
+                <category android:name="com.layer.quick_start_android"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <category android:name="com.layer.quick_start_android"/>
+            </intent-filter>
+        </receiver>
 
 
     </application>

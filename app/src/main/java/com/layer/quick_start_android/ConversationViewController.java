@@ -19,6 +19,8 @@ import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.messaging.LayerObject;
 import com.layer.sdk.messaging.Message;
 import com.layer.sdk.messaging.MessagePart;
+import com.layer.sdk.query.Query;
+import com.layer.sdk.query.SortDescriptor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,7 +65,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
         //When conversations/messages change, capture them
         layerClient.registerEventListener(this);
 
-        //List of users that are typing (used with LayerTypingIndicatorListener)
+        //List of users that are typing which is used with LayerTypingIndicatorListener
         typingUsers = new ArrayList<String>();
 
         //Change the layout
@@ -102,21 +104,32 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
             //If there isn't, create a new conversation with those participants
             if(activeConversation == null){
-                activeConversation = Conversation.newInstance(mainActivity.getAllParticipants());
+                activeConversation = layerClient.newConversation(mainActivity.getAllParticipants());
             }
         }
 
-        //Put the user's text into a message part
-        MessagePart messagePart = MessagePart.newInstance(userInput.getText().toString());
-
-        //Creates and returns a new message object with the given conversation and array of message parts
-        Message message = Message.newInstance(activeConversation, Arrays.asList(messagePart));
-
-        //Sends the specified message
-        layerClient.sendMessage(message);
+        sendMessage(userInput.getText().toString());
 
         //Clears the text input field
         userInput.setText("");
+    }
+
+    private void sendMessage(String text) {
+
+        //Put the user's text into a message part, which has a MIME type of "text/plain" by default
+        MessagePart messagePart = layerClient.newMessagePart(text);
+
+        //Creates and returns a new message object with the given conversation and array of message parts
+        Message message = layerClient.newMessage(Arrays.asList(messagePart));
+
+        //Formats the push notification that the other participants will receive
+        Map<String, String> metadata = new HashMap<String, String>();
+        metadata.put("layer-push-message", MainActivity.getUserID() + ": " + text);
+        message.setMetadata(metadata);
+
+        //Sends the message
+        if(activeConversation != null)
+            activeConversation.send(message);
     }
 
     //Create a random color and apply it to the Layer logo bar
@@ -138,12 +151,13 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
     private Conversation getConversation(){
 
         if(activeConversation == null){
-            //Grab the participants and check to see if there are any conversations
-            List<Conversation> allConversations = layerClient.getConversationsWithParticipants(mainActivity.getAllParticipants());
 
-            //Return the oldest conversation (first created)
-            if(allConversations != null && allConversations.size() > 0) {
-                return allConversations.get(0);
+            Query query = Query.builder(Conversation.class)
+                    .sortDescriptor(new SortDescriptor(Conversation.Property.CREATED_AT, SortDescriptor.Order.DESCENDING)).build();
+
+            List<Conversation> results = (List<Conversation>)layerClient.executeQueryForObjects(query);
+            if(results != null && results.size() > 0) {
+                return results.get(0);
             }
         }
 
@@ -187,7 +201,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
         //Once the message has been displayed, we mark it as read
         //NOTE: the sender of a message CANNOT mark their own message as read
         if(!msg.getSentByUserId().equalsIgnoreCase(layerClient.getAuthenticatedUserId()))
-            layerClient.markMessageAsRead(msg);
+            msg.markAsRead();
 
         //Grab the message id
         String msgId = msg.getId().toString();

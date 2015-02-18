@@ -27,5 +27,6 @@ repositories {
 
 dependencies {
     compile 'com.android.support:appcompat-v7:21.0.3'
-    compile "com.layer.sdk:layer-sdk:0.8.+"
+    compile "com.google.android.gms:play-services-base:6.5.+"
+    compile "com.layer.sdk:layer-sdk:0.9.+"
 }
