@@ -36,7 +36,6 @@ import java.util.Random;
  */
 public class ConversationViewController implements View.OnClickListener, LayerChangeEventListener.MainThread, TextWatcher, LayerTypingIndicatorListener {
 
-    private MainActivity mainActivity;
     private LayerClient layerClient;
 
     //GUI elements
@@ -58,26 +57,25 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
     public ConversationViewController(MainActivity ma, LayerClient client) {
 
-        //Cache off controller objects
-        mainActivity = ma;
+        //Cache off LayerClient
         layerClient = client;
 
         //When conversations/messages change, capture them
         layerClient.registerEventListener(this);
 
         //List of users that are typing which is used with LayerTypingIndicatorListener
-        typingUsers = new ArrayList<String>();
+        typingUsers = new ArrayList<>();
 
         //Change the layout
-        mainActivity.setContentView(R.layout.activity_main);
+        ma.setContentView(R.layout.activity_main);
 
         //Cache off gui objects
-        sendButton = (Button) mainActivity.findViewById(R.id.send);
-        topBar = (LinearLayout)mainActivity.findViewById(R.id.topbar);
-        userInput = (EditText) mainActivity.findViewById(R.id.input);
-        conversationScroll = (ScrollView) mainActivity.findViewById(R.id.scrollView);
-        conversationView = (LinearLayout) mainActivity.findViewById(R.id.conversation);
-        typingIndicator = (TextView) mainActivity.findViewById(R.id.typingIndicator);
+        sendButton = (Button) ma.findViewById(R.id.send);
+        topBar = (LinearLayout)ma.findViewById(R.id.topbar);
+        userInput = (EditText) ma.findViewById(R.id.input);
+        conversationScroll = (ScrollView) ma.findViewById(R.id.scrollView);
+        conversationView = (LinearLayout) ma.findViewById(R.id.conversation);
+        typingIndicator = (TextView) ma.findViewById(R.id.typingIndicator);
 
         //Capture user input
         sendButton.setOnClickListener(this);
@@ -104,7 +102,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
             //If there isn't, create a new conversation with those participants
             if(activeConversation == null){
-                activeConversation = layerClient.newConversation(mainActivity.getAllParticipants());
+                activeConversation = layerClient.newConversation(MainActivity.getAllParticipants());
             }
         }
 
@@ -123,7 +121,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
         Message message = layerClient.newMessage(Arrays.asList(messagePart));
 
         //Formats the push notification that the other participants will receive
-        Map<String, String> metadata = new HashMap<String, String>();
+        Map<String, String> metadata = new HashMap<>();
         metadata.put("layer-push-message", MainActivity.getUserID() + ": " + text);
         message.setMetadata(metadata);
 
@@ -155,7 +153,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
             Query query = Query.builder(Conversation.class)
                     .sortDescriptor(new SortDescriptor(Conversation.Property.CREATED_AT, SortDescriptor.Order.DESCENDING)).build();
 
-            List<Conversation> results = (List<Conversation>)layerClient.executeQueryForObjects(query);
+            List<Conversation> results = layerClient.executeQuery(query, Query.ResultType.OBJECTS);
             if(results != null && results.size() > 0) {
                 return results.get(0);
             }
@@ -350,7 +348,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
     public void afterTextChanged(Editable s) {
         //After the user has changed some text, we notify other participants that they are typing
         if(activeConversation != null)
-            layerClient.sendTypingIndicator(activeConversation, LayerTypingIndicatorListener.TypingIndicator.STARTED);
+            activeConversation.send(TypingIndicator.STARTED);
     }
 
     //================================================================================
