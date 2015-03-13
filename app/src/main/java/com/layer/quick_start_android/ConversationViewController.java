@@ -19,6 +19,7 @@ import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.messaging.LayerObject;
 import com.layer.sdk.messaging.Message;
 import com.layer.sdk.messaging.MessagePart;
+import com.layer.sdk.query.Predicate;
 import com.layer.sdk.query.Query;
 import com.layer.sdk.query.SortDescriptor;
 
@@ -151,6 +152,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
         if(activeConversation == null){
 
             Query query = Query.builder(Conversation.class)
+                    .predicate(new Predicate(Conversation.Property.PARTICIPANTS, Predicate.Operator.EQUAL_TO, MainActivity.getAllParticipants()))
                     .sortDescriptor(new SortDescriptor(Conversation.Property.CREATED_AT, SortDescriptor.Order.DESCENDING)).build();
 
             List<Conversation> results = layerClient.executeQuery(query, Query.ResultType.OBJECTS);
