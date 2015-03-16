@@ -21,7 +21,13 @@ public class MainActivity extends ActionBarActivity {
     //Go http://developer.layer.com, click on "Dashboard" and select "Info"
     public static String Layer_App_ID = "LAYER_APP_ID";
 
-    //Replace this with your Project Number from http://console.developers.google.com
+    //Optional: Enable Push Notifications
+    // Layer uses Google Cloud Messaging for Push Notifications. Go to
+    // https://developer.layer.com/docs/guides/android#push-notification
+    // and follow the guide to configure a Google Project. If the default or
+    // an invalid Project Number is used here, the Layer SDK will function, but
+    // users will not receive Notifications when the app is closed or in the
+    // background).
     public static String GCM_Project_Number = "00000";
 
 
@@ -92,24 +98,30 @@ public class MainActivity extends ActionBarActivity {
                 layerClient.registerAuthenticationListener(authenticationListener);
             }
 
+            //Check the current state of the SDK. The client must be CONNECTED and the user must
+            // be AUTHENTICATED in order to send and receive messages. Note: it is possible to be
+            // authenticated, but not connected, and vice versa, so it is a best practice to check
+            // both states when your app launches or comes to the foreground.
+            if (!layerClient.isConnected()) {
 
-            if (!layerClient.isAuthenticated()) {
-
-                //First we try to authenticate the user. if the LayerClient is not connected, "connect()"
-                //will be called automatically by the Layer SDK.
-                layerClient.authenticate();
-
-            } else if (!layerClient.isConnected()) {
-
-                //If the user is authenticated, but Layer is not connected, make sure we connect in
-                //order to send/receive messages
+                //If Layer is not connected, make sure we connect in order to send/receive messages.
+                // MyConnectionListener.java handles the callbacks associated with Connection, and
+                // will start the Authentication process once the connection is established
                 layerClient.connect();
+
+            } else if (!layerClient.isAuthenticated()) {
+
+                //If the client is already connected, try to authenticate a user on this device.
+                // MyAuthenticationListener.java handles the callbacks associated with Authentication
+                // and will start the Conversation View once the user is authenticated
+                layerClient.authenticate();
 
             } else {
 
-                // If connected to Layer and the user is authenticated, start the conversationView view
+                // If the client is to Layer and the user is authenticated, start the Conversation
+                // View. This will be called when the app moves from the background to the foreground,
+                // for example.
                 onUserAuthenticated();
-
             }
         }
     }
@@ -135,7 +147,10 @@ public class MainActivity extends ActionBarActivity {
         return true;
     }
 
-    //Return "Simulator" if this is an emulator, or "Device" if running on hardware
+    //Layer is fairly flexible when it comes to User Management. You can use an existing system, or
+    // create a new one, as long as all user ids are unique. For demonstration purposes, we are
+    // making the assumption that this App will be run simultaneously on a Simulator and on a
+    // Device, and assign the User ID based on the runtime environment.
     public static String getUserID(){
         if(Build.FINGERPRINT.startsWith("generic"))
             return "Simulator";

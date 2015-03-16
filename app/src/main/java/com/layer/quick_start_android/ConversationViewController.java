@@ -359,6 +359,11 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
     @Override
     public void onTypingIndicator(LayerClient layerClient, Conversation conversation, String userID, TypingIndicator indicator) {
+
+        //Only show the typing indicator for the active (displayed) converation
+        if(conversation != activeConversation)
+            return;
+
         switch (indicator) {
             case STARTED:
                 // This user started typing, so add them to the typing list if they are not already on it.
@@ -372,10 +377,10 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
                 break;
         }
 
-
+        //Format the text to display in the conversation view
         if(typingUsers.size() == 0){
 
-            //No one is typing
+            //No one is typing, so clear the text
             typingIndicator.setText("");
 
         } else if (typingUsers.size() == 1) {

@@ -49,7 +49,6 @@
                 <category android:name="com.layer.quick_start_android"/>
             </intent-filter>
         </receiver>
-        <service android:name="com.layer.sdk.services.GcmIntentService"/>
 
         <receiver android:name=".LayerPushReceiver">
             <intent-filter>
@@ -62,6 +61,8 @@
             </intent-filter>
         </receiver>
 
+        <!-- For GCM Push Notifications -->
+        <service android:name="com.layer.sdk.services.GcmIntentService"/>
 
     </application>
 
