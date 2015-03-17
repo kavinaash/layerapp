@@ -21,12 +21,11 @@ android {
 
 repositories {
     maven { url "https://raw.githubusercontent.com/layerhq/releases-android/master/releases/" }
-
-    mavenCentral()
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:21.0.3'
-    compile "com.google.android.gms:play-services-base:6.5.+"
-    compile "com.layer.sdk:layer-sdk:0.10.+"
+    compile 'com.android.support:appcompat-v7:22.0.0'
+    compile 'com.google.android.gms:play-services-base:6.5.+'
+    compile 'com.layer.sdk:layer-sdk:0.11.+'
+    compile 'org.slf4j:slf4j-api:1.7.7'
 }
