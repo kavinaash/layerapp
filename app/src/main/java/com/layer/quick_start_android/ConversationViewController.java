@@ -141,9 +141,6 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
         setTopBarMetaData(red, green, blue);
         setTopBarColor(red, green, blue);
-
-
-
     }
 
     //Checks to see if there is already a conversation between the device and emulator
@@ -226,8 +223,9 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
             metadata.put("backgroundColor", colors);
 
-            //Merge this new information with the existing metadata
-            layerClient.putMetadata(activeConversation, metadata, true);
+            //Merge this new information with the existing metadata (passing in false will replace
+            // the existing Map, passing in true ensures existing key/values are preserved)
+            activeConversation.putMetadata(metadata, true);
         }
     }
 
