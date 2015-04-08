@@ -13,7 +13,9 @@ import android.widget.TextView;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.changes.LayerChange;
 import com.layer.sdk.changes.LayerChangeEvent;
+import com.layer.sdk.exceptions.LayerException;
 import com.layer.sdk.listeners.LayerChangeEventListener;
+import com.layer.sdk.listeners.LayerSyncListener;
 import com.layer.sdk.listeners.LayerTypingIndicatorListener;
 import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.messaging.LayerObject;
@@ -35,7 +37,7 @@ import java.util.Random;
  * Handles the conversation between the pre-defined participants (Device, Emulator) and displays
  * messages in the GUI.
  */
-public class ConversationViewController implements View.OnClickListener, LayerChangeEventListener.MainThread, TextWatcher, LayerTypingIndicatorListener {
+public class ConversationViewController implements View.OnClickListener, LayerChangeEventListener.MainThread, TextWatcher, LayerTypingIndicatorListener, LayerSyncListener {
 
     private LayerClient layerClient;
 
@@ -398,5 +400,20 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
             typingIndicator.setText(users + " are typing");
         }
+    }
+
+    //Called before syncing with the Layer servers
+    public void onBeforeSync(LayerClient layerClient) {
+        System.out.println("Sync starting");
+    }
+
+    //Called after syncing with the Layer servers
+    public void onAfterSync(LayerClient layerClient) {
+        System.out.println("Sync complete");
+    }
+
+    //Captures any errors with syncing
+    public void onSyncError(LayerClient layerClient, List<LayerException> layerExceptions) {
+
     }
 }

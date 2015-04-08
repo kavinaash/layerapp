@@ -1,3 +1,25 @@
+/*
+ * This Quick Start App is designed to get you up and running as quickly as possible with the
+ *  Layer SDK. There are no frills in this app, which is designed to be run on a Device and Simulator
+ *  and starts a conversation between the two.
+ *
+ *  Key Features
+ *   - Start a single conversation between a physical device ("Device") and Emulator ("Simulator")
+ *   - The Device will support Push Notifications if tied to a properly configured Google Project
+ *   - Functionality includes: Connecting to Layer, Authenticating a User, Running a Query, Creating
+ *     a New Conversation, Sending Text Messages, Typing Indicators, Delivery/Read Receipts, Event
+ *     Change Listeners, and Sync Listeners
+ *   - Works cross platform with the iOS Quick Start App
+ *
+ *  Setup
+ *   - Replace the "LAYER_APP_ID" with the Staging App ID in the Layer Dashboard (under the "Info"
+ *     tab)
+ *   - Optional: Replace "GCM_Project_Number" with a correctly configured Google Project Number in
+ *     order to support Push
+ *   - Launch the App on both a Device and a Simulator to start a conversation
+ *
+ */
+
 package com.layer.quick_start_android;
 
 import android.app.AlertDialog;
@@ -10,10 +32,6 @@ import com.layer.sdk.LayerClient;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-
-/*
- * Handles the main activity and conversationView view
- */
 
 public class MainActivity extends ActionBarActivity {
 
@@ -87,7 +105,8 @@ public class MainActivity extends ActionBarActivity {
 
             if(layerClient == null){
 
-                LayerClient.setLogLevel(LayerClient.LogLevel.DETAILED);
+                //Used for debugging purposes ONLY. DO NOT include this option in Production Builds.
+                LayerClient.enableLogging();
 
                 // Initializes a LYRClient object
                 UUID appID = UUID.fromString(Layer_App_ID);
