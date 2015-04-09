@@ -153,7 +153,7 @@ public class MainActivity extends ActionBarActivity {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
             // Chain together various setter methods to set the dialog characteristics
-            builder.setMessage("To correctly use this project you need to replace LAYER_APP_ID in MainActivity.java (line 40) with your App ID from developer.layer.com.")
+            builder.setMessage("To correctly use this project you need to replace LAYER_APP_ID in MainActivity.java (line 21) with your App ID from developer.layer.com.")
                     .setTitle(":-(");
 
             // Get the AlertDialog from create() and then show() it
