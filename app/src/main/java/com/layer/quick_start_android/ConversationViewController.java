@@ -199,7 +199,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
         //Once the message has been displayed, we mark it as read
         //NOTE: the sender of a message CANNOT mark their own message as read
-        if(!msg.getSentByUserId().equalsIgnoreCase(layerClient.getAuthenticatedUserId()))
+        if(!msg.getSender().getUserId().equalsIgnoreCase(layerClient.getAuthenticatedUserId()))
             msg.markAsRead();
 
         //Grab the message id

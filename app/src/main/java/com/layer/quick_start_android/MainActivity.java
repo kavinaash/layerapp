@@ -31,7 +31,6 @@ import com.layer.sdk.LayerClient;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -108,9 +107,13 @@ public class MainActivity extends ActionBarActivity {
                 //Used for debugging purposes ONLY. DO NOT include this option in Production Builds.
                 LayerClient.enableLogging();
 
-                // Initializes a LYRClient object
-                UUID appID = UUID.fromString(Layer_App_ID);
-                layerClient = LayerClient.newInstance(this, appID, GCM_Project_Number);
+                // Initializes a LayerClient object with the Google Project Number
+                LayerClient.Options options = new LayerClient.Options();
+                options.googleCloudMessagingSenderId(GCM_Project_Number);
+                layerClient = LayerClient.newInstance(this, Layer_App_ID, options);
+
+                if(connectionListener == null)
+                    System.out.println("HERE");
 
                 //Register the connection and authentication listeners
                 layerClient.registerConnectionListener(connectionListener);

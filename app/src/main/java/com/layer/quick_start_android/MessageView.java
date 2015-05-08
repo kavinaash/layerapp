@@ -69,7 +69,7 @@ public class MessageView {
     private String craftSenderText(Message msg){
 
         //The User ID
-        String senderTxt = msg.getSentByUserId();
+        String senderTxt = msg.getSender().getUserId();
 
         //Add the timestamp
         if(msg.getSentAt() != null) {
@@ -87,7 +87,7 @@ public class MessageView {
     private Message.RecipientStatus getMessageStatus(Message msg) {
 
         //If we didn't send the message, we already know the status - we have read it
-        if (!msg.getSentByUserId().equalsIgnoreCase(MainActivity.getUserID()))
+        if (!msg.getSender().getUserId().equalsIgnoreCase(MainActivity.getUserID()))
             return Message.RecipientStatus.READ;
 
         //Assume the message has been sent
