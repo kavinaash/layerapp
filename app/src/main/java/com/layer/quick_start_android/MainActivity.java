@@ -112,9 +112,6 @@ public class MainActivity extends ActionBarActivity {
                 options.googleCloudMessagingSenderId(GCM_Project_Number);
                 layerClient = LayerClient.newInstance(this, Layer_App_ID, options);
 
-                if(connectionListener == null)
-                    System.out.println("HERE");
-
                 //Register the connection and authentication listeners
                 layerClient.registerConnectionListener(connectionListener);
                 layerClient.registerAuthenticationListener(authenticationListener);
