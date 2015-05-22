@@ -12,7 +12,7 @@ The QuickStart application requires Android Studio and the Layer SDK. Dependenci
 
 1. Clone the project from Github: `$ git clone https://github.com/layerhq/quick-start-android.git`
 2. Open the workspace in Android Studio
-3. Replace LAYER_APP_ID in MainActivity.java (line 11) with your App ID from http://developer.layer.com.  If you skip this step you will get an error on app launch.
+3. Replace LAYER_APP_ID in MainActivity.java (line 11) with your App ID. Your App ID can be found in the dashboard under the "Info" section.  If you skip this step you will get an error on app launch.
 4. (Optional) Replace GCM_ID with your own Google Cloud Messaging ID (instructions can be found here: https://developer.layer.com/docs/guides#push-notification)
 5. Build and run the QuickStart application on an Emulator and a physical Device to start a 1:1 conversation between them.
 
