@@ -22,16 +22,15 @@ import com.layer.sdk.messaging.LayerObject;
 import com.layer.sdk.messaging.Message;
 import com.layer.sdk.messaging.MessageOptions;
 import com.layer.sdk.messaging.MessagePart;
+import com.layer.sdk.messaging.Metadata;
 import com.layer.sdk.query.Predicate;
 import com.layer.sdk.query.Query;
 import com.layer.sdk.query.SortDescriptor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 /**
@@ -216,9 +215,10 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
     //Stores RGB values in the conversation's metadata
     private void setTopBarMetaData(float red, float green, float blue){
         if(activeConversation != null) {
-            Map<String, Object> metadata = new HashMap<String, Object>();
 
-            Map<String, Object> colors = new HashMap<String, Object>();
+            Metadata metadata = Metadata.newInstance();
+
+            Metadata colors = Metadata.newInstance();
             colors.put("red", Float.toString(red));
             colors.put("green", Float.toString(green));
             colors.put("blue", Float.toString(blue));
@@ -235,10 +235,10 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
     private void getTopBarMetaData(){
         if(activeConversation != null) {
 
-            Map<String, Object> current = activeConversation.getMetadata();
+            Metadata current = activeConversation.getMetadata();
             if(current.containsKey("backgroundColor")) {
 
-                Map<String, Object> colors = (Map<String, Object>)current.get("backgroundColor");
+                Metadata colors = (Metadata)current.get("backgroundColor");
 
                 if(colors != null) {
 
