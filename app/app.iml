@@ -88,10 +88,9 @@
     <orderEntry type="library" exported="" name="appcompat-v7-22.1.1" level="project" />
     <orderEntry type="library" exported="" name="slf4j-api-1.7.7" level="project" />
     <orderEntry type="library" exported="" name="play-services-gcm-7.5.0" level="project" />
-    <orderEntry type="library" exported="" name="layer-sdk-0.14.0" level="project" />
+    <orderEntry type="library" exported="" name="layer-sdk-0.15.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-base-7.5.0" level="project" />
     <orderEntry type="library" exported="" name="support-v4-22.1.1" level="project" />
-    <orderEntry type="library" exported="" name="slf4j-nop-1.5.8" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-22.1.1" level="project" />
   </component>
 </module>
