@@ -20,6 +20,7 @@ import com.layer.sdk.listeners.LayerTypingIndicatorListener;
 import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.messaging.LayerObject;
 import com.layer.sdk.messaging.Message;
+import com.layer.sdk.messaging.MessageOptions;
 import com.layer.sdk.messaging.MessagePart;
 import com.layer.sdk.query.Predicate;
 import com.layer.sdk.query.Query;
@@ -120,13 +121,12 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
         //Put the user's text into a message part, which has a MIME type of "text/plain" by default
         MessagePart messagePart = layerClient.newMessagePart(text);
 
-        //Creates and returns a new message object with the given conversation and array of message parts
-        Message message = layerClient.newMessage(Arrays.asList(messagePart));
-
         //Formats the push notification that the other participants will receive
-        Map<String, String> metadata = new HashMap<>();
-        metadata.put("layer-push-message", MainActivity.getUserID() + ": " + text);
-        message.setMetadata(metadata);
+        MessageOptions options = new MessageOptions();
+        options.pushNotificationMessage(MainActivity.getUserID() + ": " + text);
+
+        //Creates and returns a new message object with the given conversation and array of message parts
+        Message message = layerClient.newMessage(options, Arrays.asList(messagePart));
 
         //Sends the message
         if(activeConversation != null)

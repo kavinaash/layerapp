@@ -25,14 +25,14 @@ package com.layer.quick_start_android;
 import android.app.AlertDialog;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import com.layer.sdk.LayerClient;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
 
     //Replace this with your App ID from the Layer Developer page.
     //Go http://developer.layer.com, click on "Dashboard" and select "Info"
@@ -153,7 +153,7 @@ public class MainActivity extends ActionBarActivity {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
             // Chain together various setter methods to set the dialog characteristics
-            builder.setMessage("To correctly use this project you need to replace LAYER_APP_ID in MainActivity.java (line 21) with your App ID from developer.layer.com.")
+            builder.setMessage("To correctly use this project you need to replace LAYER_APP_ID in MainActivity.java (line 39) with your App ID from developer.layer.com.")
                     .setTitle(":-(");
 
             // Get the AlertDialog from create() and then show() it

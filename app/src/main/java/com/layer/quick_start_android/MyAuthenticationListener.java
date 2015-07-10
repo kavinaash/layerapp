@@ -65,7 +65,7 @@ public class MyAuthenticationListener implements LayerAuthenticationListener {
     }
 
     //Called when the user has successfully authenticated
-    public void onAuthenticated(LayerClient client, String arg1) {
+    public void onAuthenticated(LayerClient client, String userID) {
 
         //Start the conversation view after a successful authentication
         System.out.println("Authentication successful");
