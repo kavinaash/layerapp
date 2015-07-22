@@ -68,8 +68,13 @@ public class MessageView {
     //  User @ Timestamp - Status
     private String craftSenderText(Message msg){
 
+        if(msg == null)
+            return "";
+
         //The User ID
-        String senderTxt = msg.getSender().getUserId();
+        String senderTxt = "";
+        if(msg.getSender() != null && msg.getSender().getUserId() != null)
+            senderTxt = msg.getSender().getUserId();
 
         //Add the timestamp
         if(msg.getSentAt() != null) {
@@ -85,6 +90,9 @@ public class MessageView {
 
     //Checks the recipient status of the message (based on all participants)
     private Message.RecipientStatus getMessageStatus(Message msg) {
+
+        if(msg == null || msg.getSender() == null || msg.getSender().getUserId() == null)
+            return Message.RecipientStatus.PENDING;
 
         //If we didn't send the message, we already know the status - we have read it
         if (!msg.getSender().getUserId().equalsIgnoreCase(MainActivity.getUserID()))

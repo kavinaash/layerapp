@@ -193,7 +193,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
     private void addMessageToView(Message msg){
 
         //Make sure the message is valid
-        if(msg == null)
+        if(msg == null || msg.getSender() == null || msg.getSender().getUserId() == null)
             return;
 
         //Once the message has been displayed, we mark it as read
