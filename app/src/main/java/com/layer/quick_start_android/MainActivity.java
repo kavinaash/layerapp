@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Replace this with your App ID from the Layer Developer page.
     //Go http://developer.layer.com, click on "Dashboard" and select "Info"
-    public static String Layer_App_ID = "LAYER_APP_ID";
+    public static final String LAYER_APP_ID = "LAYER_APP_ID";
 
     //Optional: Enable Push Notifications
     // Layer uses Google Cloud Messaging for Push Notifications. Go to
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     // an invalid Project Number is used here, the Layer SDK will function, but
     // users will not receive Notifications when the app is closed or in the
     // background).
-    public static String GCM_Project_Number = "00000";
+    public static final String GCM_PROJECT_NUMBER = "00000";
 
 
     //Global variables used to manage the Layer Client and the conversations in this app
@@ -109,8 +109,8 @@ public class MainActivity extends AppCompatActivity {
 
                 // Initializes a LayerClient object with the Google Project Number
                 LayerClient.Options options = new LayerClient.Options();
-                options.googleCloudMessagingSenderId(GCM_Project_Number);
-                layerClient = LayerClient.newInstance(this, Layer_App_ID, options);
+                options.googleCloudMessagingSenderId(GCM_PROJECT_NUMBER);
+                layerClient = LayerClient.newInstance(this, LAYER_APP_ID, options);
 
                 //Register the connection and authentication listeners
                 layerClient.registerConnectionListener(connectionListener);
@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
 
     //If you haven't replaced "LAYER_APP_ID" with your App ID, send a message
     private boolean isValidAppID() {
-        if(Layer_App_ID.equalsIgnoreCase("LAYER_APP_ID")) {
+        if(LAYER_APP_ID.equalsIgnoreCase("LAYER_APP_ID")) {
 
             // Instantiate an AlertDialog.Builder with its constructor
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
