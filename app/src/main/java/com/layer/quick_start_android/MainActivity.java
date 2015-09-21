@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Replace this with your App ID from the Layer Developer page.
     //Go http://developer.layer.com, click on "Dashboard" and select "Info"
-    public static final String LAYER_APP_ID = "LAYER_APP_ID";
+    public static final String LAYER_APP_ID = "layer:///apps/staging/329b182c-60ba-11e5-b1ee-d08500001f7e";
 
     //Optional: Enable Push Notifications
     // Layer uses Google Cloud Messaging for Push Notifications. Go to
@@ -109,7 +109,15 @@ public class MainActivity extends AppCompatActivity {
 
                 // Initializes a LayerClient object with the Google Project Number
                 LayerClient.Options options = new LayerClient.Options();
+
+                //Sets the GCM sender id allowing for push notifications
                 options.googleCloudMessagingSenderId(GCM_PROJECT_NUMBER);
+
+                //By default, only unread messages are synced after a user is authenticated, but you
+                // can change that behavior to all messages or just the last message in a conversation
+                options.historicSyncPolicy(LayerClient.Options.HistoricSyncPolicy.ALL_MESSAGES);
+
+
                 layerClient = LayerClient.newInstance(this, LAYER_APP_ID, options);
 
                 //Register the connection and authentication listeners

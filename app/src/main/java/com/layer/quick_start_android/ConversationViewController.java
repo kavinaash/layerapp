@@ -424,6 +424,12 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
         Log.v(TAG, "Sync starting");
     }
 
+    //Called during a sync, you can drive a spinner or progress bar using pctComplete, which is a
+    // range between 0 and 100
+    public void onSyncProgress(LayerClient layerClient, int pctComplete) {
+        Log.v(TAG, "Sync is "  + pctComplete + "% Complete");
+    }
+
     //Called after syncing with the Layer servers
     public void onAfterSync(LayerClient layerClient) {
         Log.v(TAG, "Sync complete");
@@ -431,6 +437,8 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
     //Captures any errors with syncing
     public void onSyncError(LayerClient layerClient, List<LayerException> layerExceptions) {
-
+        for(LayerException e : layerExceptions){
+            Log.v(TAG, "onSyncError: " + e.toString());
+        }
     }
 }
