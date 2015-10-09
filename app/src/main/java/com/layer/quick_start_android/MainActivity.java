@@ -12,7 +12,7 @@
  *   - Works cross platform with the iOS Quick Start App
  *
  *  Setup
- *   - Replace the "LAYER_APP_ID" with the Staging App ID in the Layer Dashboard (under the "Info"
+ *   - Replace the "LAYER_APP_ID" with the Staging App ID in the Layer Dashboard (under the "Keys"
  *     tab)
  *   - Optional: Replace "GCM_Project_Number" with a correctly configured Google Project Number in
  *     order to support Push
@@ -35,7 +35,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     //Replace this with your App ID from the Layer Developer page.
-    //Go http://developer.layer.com, click on "Dashboard" and select "Info"
+    //Go http://developer.layer.com, click on "Dashboard" and select "Keys"
     public static final String LAYER_APP_ID = "LAYER_APP_ID";
 
     //Optional: Enable Push Notifications
