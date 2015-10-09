@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Replace this with your App ID from the Layer Developer page.
     //Go http://developer.layer.com, click on "Dashboard" and select "Info"
-    public static final String LAYER_APP_ID = "layer:///apps/staging/329b182c-60ba-11e5-b1ee-d08500001f7e";
+    public static final String LAYER_APP_ID = "LAYER_APP_ID";
 
     //Optional: Enable Push Notifications
     // Layer uses Google Cloud Messaging for Push Notifications. Go to
