@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
             if(layerClient == null){
 
                 //Used for debugging purposes ONLY. DO NOT include this option in Production Builds.
-                LayerClient.enableLogging(this.getApplicationContext());
+                //LayerClient.setLoggingEnabled(this.getApplicationContext(),true);
 
                 // Initializes a LayerClient object with the Google Project Number
                 LayerClient.Options options = new LayerClient.Options();
