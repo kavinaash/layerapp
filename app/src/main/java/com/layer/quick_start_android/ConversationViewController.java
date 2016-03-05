@@ -27,6 +27,7 @@ import com.layer.sdk.messaging.Metadata;
 import com.layer.sdk.query.Predicate;
 import com.layer.sdk.query.Query;
 import com.layer.sdk.query.SortDescriptor;
+import com.layer.sdk.query.Queryable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,8 +39,8 @@ import java.util.Random;
  * Handles the conversation between the pre-defined participants (Device, Emulator) and displays
  * messages in the GUI.
  */
-public class ConversationViewController implements View.OnClickListener, LayerChangeEventListener
-        .MainThread, TextWatcher, LayerTypingIndicatorListener, LayerSyncListener {
+public class ConversationViewController implements View.OnClickListener, LayerChangeEventListener,
+        TextWatcher, LayerTypingIndicatorListener, LayerSyncListener {
 
     private static final String TAG = ConversationViewController.class.getSimpleName();
 
@@ -295,7 +296,8 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
     // LayerChangeEventListener methods
     //================================================================================
 
-    public void onEventMainThread(LayerChangeEvent event) {
+    @Override
+    public void onChangeEvent(LayerChangeEvent event) {
 
         //You can choose to handle changes to conversations or messages however you'd like:
         List<LayerChange> changes = event.getChanges();
@@ -420,25 +422,26 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
     }
 
     //Called before syncing with the Layer servers
-    public void onBeforeSync(LayerClient layerClient) {
+    public void onBeforeSync(LayerClient layerClient, SyncType syncType) {
         Log.v(TAG, "Sync starting");
     }
 
     //Called during a sync, you can drive a spinner or progress bar using pctComplete, which is a
     // range between 0 and 100
-    public void onSyncProgress(LayerClient layerClient, int pctComplete) {
+    public void onSyncProgress(LayerClient layerClient, SyncType syncType, int pctComplete) {
         Log.v(TAG, "Sync is "  + pctComplete + "% Complete");
     }
 
     //Called after syncing with the Layer servers
-    public void onAfterSync(LayerClient layerClient) {
+    public void onAfterSync(LayerClient layerClient, SyncType syncType) {
         Log.v(TAG, "Sync complete");
     }
 
     //Captures any errors with syncing
     public void onSyncError(LayerClient layerClient, List<LayerException> layerExceptions) {
-        for(LayerException e : layerExceptions){
+        for (LayerException e : layerExceptions) {
             Log.v(TAG, "onSyncError: " + e.toString());
         }
     }
+
 }

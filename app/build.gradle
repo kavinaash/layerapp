@@ -28,6 +28,6 @@ repositories {
 dependencies {
     compile 'com.android.support:appcompat-v7:+'
     compile 'com.google.android.gms:play-services-gcm:7.5.0'
-    compile 'com.layer.sdk:layer-sdk:0.17.1'
+    compile 'com.layer.sdk:layer-sdk:0.19.5'
     compile 'org.slf4j:slf4j-api:1.7.7'
 }
