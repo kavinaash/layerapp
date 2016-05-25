@@ -1,3 +1,10 @@
+***
+
+> This app is for demo puroposes. Please do not use this app as starting point for new a new app. For that please look at 
+> Android-Atlas-Messenger at https://github.com/layerhq/Atlas-Android-Messenger
+
+***
+
 # Layer QuickStart for Android
 
 **Example code for integrating [LayerKit](https://layer.com/).**
