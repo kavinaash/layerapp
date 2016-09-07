@@ -37,6 +37,7 @@ public class MessageView {
         messageDetails.setOrientation(LinearLayout.HORIZONTAL);
         myParent.addView(messageDetails);
 
+
         //Creates the sender text view, sets the text to be italic, and attaches it to the parent
         senderTV = new TextView(parent.getContext());
         senderTV.setTypeface(null, Typeface.ITALIC);

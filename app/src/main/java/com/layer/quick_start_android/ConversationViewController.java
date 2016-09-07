@@ -1,6 +1,7 @@
 package com.layer.quick_start_android;
 
 import android.graphics.Color;
+import android.net.Uri;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -11,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.layer.atlas.AtlasConversationsRecyclerView;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.changes.LayerChange;
 import com.layer.sdk.changes.LayerChangeEvent;
@@ -27,7 +29,6 @@ import com.layer.sdk.messaging.Metadata;
 import com.layer.sdk.query.Predicate;
 import com.layer.sdk.query.Query;
 import com.layer.sdk.query.SortDescriptor;
-import com.layer.sdk.query.Queryable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,6 +46,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
     private static final String TAG = ConversationViewController.class.getSimpleName();
 
     private LayerClient layerClient;
+    AtlasConversationsRecyclerView conversationsList;
 
     //GUI elements
     private Button sendButton;
@@ -77,6 +79,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
         //Change the layout
         ma.setContentView(R.layout.activity_main);
 
+
         //Cache off gui objects
         sendButton = (Button) ma.findViewById(R.id.send);
         topBar = (LinearLayout) ma.findViewById(R.id.topbar);
@@ -87,12 +90,13 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
         //Capture user input
         sendButton.setOnClickListener(this);
-        topBar.setOnClickListener(this);
-        userInput.setText(getInitialMessage());
+//        topBar.setOnClickListener(this);
+//        userInput.setText(getInitialMessage());
         userInput.addTextChangedListener(this);
 
         //If there is an active conversation between the Device, Simulator, and Dashboard (web
         // client), cache it
+       List<Uri>a= layerClient.getConversationIds();
         activeConversation = getConversation();
 
         //If there is an active conversation, draw it
@@ -132,7 +136,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
         //Formats the push notification that the other participants will receive
         MessageOptions options = new MessageOptions();
-        options.pushNotificationMessage(MainActivity.getUserID() + ": " + text);
+//        options.pushNotificationMessage(MainActivity.getUserID() + ": " + text);
 
         //Creates and returns a new message object with the given conversation and array of
         // message parts

@@ -23,11 +23,15 @@
 package com.layer.quick_start_android;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.layer.atlas.provider.ParticipantProvider;
+import com.layer.atlas.util.picasso.requesthandlers.MessagePartRequestHandler;
 import com.layer.sdk.LayerClient;
+import com.squareup.picasso.Picasso;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Replace this with your App ID from the Layer Developer page.
     //Go http://developer.layer.com, click on "Dashboard" and select "Keys"
-    public static final String LAYER_APP_ID = "LAYER_APP_ID";
+    public static final String LAYER_APP_ID = "layer:///apps/staging/170be0e8-6846-11e6-a7a9-d9a4c50e244c";
 
     //Optional: Enable Push Notifications
     // Layer uses Google Cloud Messaging for Push Notifications. Go to
@@ -45,8 +49,9 @@ public class MainActivity extends AppCompatActivity {
     // an invalid Project Number is used here, the Layer SDK will function, but
     // users will not receive Notifications when the app is closed or in the
     // background).
-    public static final String GCM_PROJECT_NUMBER = "00000";
-
+    public static final String GCM_PROJECT_NUMBER = "24320527281";
+    private static Picasso sPicasso;
+    ConversationsListActivity conversationsListActivity;
 
     //Global variables used to manage the Layer Client and the conversations in this app
     private LayerClient layerClient;
@@ -55,6 +60,9 @@ public class MainActivity extends AppCompatActivity {
     //Layer connection and authentication callback listeners
     private MyConnectionListener connectionListener;
     private MyAuthenticationListener authenticationListener;
+
+    ParticipantProvider participantProvider;
+    Flavor myflavor;
 
     //onCreate is called on App Start
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         //Every time the app is brought to the foreground, register the typing indicator
         if(layerClient != null && conversationView != null)
             layerClient.registerTypingIndicator(conversationView);
+
     }
 
     //onPause is called when the app is sent to the background
@@ -190,16 +199,39 @@ public class MainActivity extends AppCompatActivity {
         return Arrays.asList("Device", "Simulator", "Dashboard");
     }
 
+
     //Once the user has successfully authenticated, begin the conversationView
     public void onUserAuthenticated(){
 
         if(conversationView == null) {
 
-            conversationView = new ConversationViewController(this, layerClient);
+//            conversationView = new ConversationViewController(this, layerClient);
+            conversationsListActivity=new ConversationsListActivity(this,layerClient);
 
             if (layerClient != null) {
-                layerClient.registerTypingIndicator(conversationView);
+//                layerClient.registerTypingIndicator(conversationView);
+//                layerClient.registerTypingIndicator(conversationsListActivity);
             }
         }
+    }
+    public Picasso getPicasso() {
+        if (sPicasso == null) {
+            // Picasso with custom RequestHandler for loading from Layer MessageParts.
+            sPicasso = new Picasso.Builder(this)
+                    .addRequestHandler(new MessagePartRequestHandler(layerClient))
+                    .build();
+        }
+        return sPicasso;
+    }
+    public  ParticipantProvider getParticipantProvider(){
+
+        if(participantProvider==null) {
+            participantProvider = myflavor.generateParticipantProvider(this, layerClient);
+        }
+        return participantProvider;
+    }
+
+    public interface Flavor{
+        ParticipantProvider generateParticipantProvider(Context context,LayerClient layerClient);
     }
 }
