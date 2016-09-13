@@ -31,7 +31,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+         <activity android:name=".ConversationsListActivity">
 
+         </activity>
         <!-- Layer SDK has these for monitoring network, boot, and GCM -->
         <receiver android:name="com.layer.sdk.services.LayerReceiver">
             <intent-filter>

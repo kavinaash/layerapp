@@ -81,12 +81,12 @@ public class MyAuthenticationListener implements LayerAuthenticationListener {
     //Called when there was a problem authenticating
     //Common causes include a malformed identity token, missing parameters in the identity token,
     // missing
-    //or incorrect nonce
     public void onAuthenticationError(LayerClient layerClient, LayerException e) {
         Log.v(TAG, "There was an error authenticating: " + e);
     }
 
     //Called after the user has been deauthenticated
+    //or incorrect nonce
     public void onDeauthenticated(LayerClient client) {
         Log.v(TAG, "User is deauthenticated.");
     }

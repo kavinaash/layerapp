@@ -26,7 +26,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.layer.atlas.provider.ParticipantProvider;
 import com.layer.atlas.util.picasso.requesthandlers.MessagePartRequestHandler;
@@ -51,7 +55,8 @@ public class MainActivity extends AppCompatActivity {
     // background).
     public static final String GCM_PROJECT_NUMBER = "24320527281";
     private static Picasso sPicasso;
-    ConversationsListActivity conversationsListActivity;
+    AuthenticationProvider sAuthProvider;
+
 
     //Global variables used to manage the Layer Client and the conversations in this app
     private LayerClient layerClient;
@@ -60,17 +65,24 @@ public class MainActivity extends AppCompatActivity {
     //Layer connection and authentication callback listeners
     private MyConnectionListener connectionListener;
     private MyAuthenticationListener authenticationListener;
+    ProgressBar progressBar;
 
     ParticipantProvider participantProvider;
-    Flavor myflavor;
+    Flavor myflavor=new com.layer.quick_start_android.Flavor();
 
     //onCreate is called on App Start
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         //If we haven't created a LayerClient, show the loading splash screen
-        if(layerClient == null)
+        if(layerClient == null) {
             setContentView(R.layout.activity_loading);
+            progressBar=(ProgressBar)findViewById(R.id.loading);
+            progressBar.setVisibility(View.VISIBLE);
+
+        }
+        else
+        progressBar.setVisibility(View.GONE);
 
 
         //Create the callback listeners
@@ -88,6 +100,17 @@ public class MainActivity extends AppCompatActivity {
 
         //Connect to Layer and Authenticate a user
         loadLayerClient();
+//        load(new MyAuthenticationProvider.Credentials(getLayerClient().getAppId().toString(),getDeviceID(),null,null), new AuthenticationProvider.Callback() {
+//            @Override
+//            public void onSuccess(AuthenticationProvider provider, String userId) {
+//
+//            }
+//
+//            @Override
+//            public void onError(AuthenticationProvider provider, String error) {
+//
+//            }
+//        });
 
         //Every time the app is brought to the foreground, register the typing indicator
         if(layerClient != null && conversationView != null)
@@ -104,6 +127,16 @@ public class MainActivity extends AppCompatActivity {
             layerClient.unregisterTypingIndicator(conversationView);
     }
 
+    private void load(MyAuthenticationProvider.Credentials credentials, AuthenticationProvider.Callback callback){
+        LayerClient client = getLayerClient();
+        if (client == null) return;
+        String layerAppId = getLayerClient().getAppId().toString();
+        if (layerAppId == null) return;
+        getAuthenticationProvider()
+                .setCredentials(credentials)
+                .setCallback(callback);
+        client.authenticate();
+    }
     //Checks to see if the SDK is connected to Layer and whether a user is authenticated
     //The respective callbacks are executed in MyConnectionListener and MyAuthenticationListener
     private void loadLayerClient(){
@@ -194,6 +227,10 @@ public class MainActivity extends AppCompatActivity {
         return "Device";
     }
 
+    public String getDeviceID() {
+        String androidId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        return Base64.encodeToString(androidId.getBytes(), Base64.NO_WRAP);
+    }
     //By default, create a conversationView between these 3 participants
     public static List<String> getAllParticipants(){
         return Arrays.asList("Device", "Simulator", "Dashboard");
@@ -205,15 +242,17 @@ public class MainActivity extends AppCompatActivity {
 
         if(conversationView == null) {
 
-//            conversationView = new ConversationViewController(this, layerClient);
-            conversationsListActivity=new ConversationsListActivity(this,layerClient);
+            conversationView = new ConversationViewController(this, layerClient);
+//            Intent intent=new Intent(MainActivity.this,ConversationsListActivity.class);
+//            startActivity(intent);
 
             if (layerClient != null) {
-//                layerClient.registerTypingIndicator(conversationView);
+                layerClient.registerTypingIndicator(conversationView);
 //                layerClient.registerTypingIndicator(conversationsListActivity);
             }
         }
     }
+
     public Picasso getPicasso() {
         if (sPicasso == null) {
             // Picasso with custom RequestHandler for loading from Layer MessageParts.
@@ -223,15 +262,34 @@ public class MainActivity extends AppCompatActivity {
         }
         return sPicasso;
     }
+
+    public LayerClient getLayerClient(){
+        return layerClient;
+    }
+
     public  ParticipantProvider getParticipantProvider(){
 
         if(participantProvider==null) {
-            participantProvider = myflavor.generateParticipantProvider(this, layerClient);
+            participantProvider = myflavor.generateParticipantProvider(this, getAuthenticationProvider());
         }
         return participantProvider;
     }
 
+   
+
+    public  AuthenticationProvider getAuthenticationProvider(){
+        if (sAuthProvider == null) {
+            sAuthProvider = myflavor.generateAuthenticationProvider(this);
+
+            // If we have cached credentials, try authenticating with Layer
+            LayerClient layerClient = getLayerClient();
+            if (layerClient != null && sAuthProvider.hasCredentials()) layerClient.authenticate();
+        }
+        return sAuthProvider;
+    }
+
     public interface Flavor{
-        ParticipantProvider generateParticipantProvider(Context context,LayerClient layerClient);
+        ParticipantProvider generateParticipantProvider(Context context,AuthenticationProvider authenticationProvider);
+        AuthenticationProvider generateAuthenticationProvider(Context context);
     }
 }

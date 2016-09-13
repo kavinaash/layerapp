@@ -1,21 +1,25 @@
 package com.layer.quick_start_android;
 
 import android.content.Context;
+import android.os.AsyncTask;
 
 import com.layer.atlas.provider.Participant;
 import com.layer.atlas.provider.ParticipantProvider;
 import com.layer.atlas.util.Log;
 import com.layer.sdk.LayerClient;
-import com.layer.sdk.exceptions.LayerConversationException;
 import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.messaging.ConversationOptions;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -27,24 +31,26 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class MyParticipantProvider implements ParticipantProvider {
 
-    private final Context mcontext;Conversation conversation;
-    String A="!";ConversationOptions options;
+    private final Context mcontext;
+    Conversation conversation;
+    ConversationOptions options;
     LayerClient mlayerClient;
+    MyAuthenticationProvider mAuthenticationProvider;
     private final Map<String, MyParticipant> mParticipantMap = new HashMap<String, MyParticipant>();
     private final AtomicBoolean mFetching = new AtomicBoolean(false);
 
-    public MyParticipantProvider(Context context, LayerClient layerClient) {
+    public MyParticipantProvider(Context context) {
         mcontext = context.getApplicationContext();
-        mlayerClient=layerClient;
-        load();
-//        fetchParticipants();
+                load();
+        fetchParticipants();
     }
     public  MyParticipantProvider setConversation()
     {
-//        fetchParticipants();
-        setParticipants(myparticipantsFromJson());
+        fetchParticipants();
+//        setParticipants(myparticipantsFromJson());
         return this;
     }
+
 
     private static List<MyParticipant> myparticipantsFromJson(){
         List<MyParticipant> participants = new ArrayList<>(1);
@@ -60,7 +66,11 @@ public class MyParticipantProvider implements ParticipantProvider {
 
         return participants;
     }
-
+    public MyParticipantProvider setAuthenticationProvider(AuthenticationProvider authenticationProvider) {
+        mAuthenticationProvider = (MyAuthenticationProvider) authenticationProvider;
+        fetchParticipants();
+        return this;
+    }
 
     @Override
     public Map<String, Participant> getMatchingParticipants(String filter, Map<String, Participant> result) {
@@ -156,16 +166,70 @@ public class MyParticipantProvider implements ParticipantProvider {
     }
     private MyParticipantProvider fetchParticipants() {
 
-        try {
-            options = new ConversationOptions().distinct(true);
-            // Try creating a new distinct conversation with the given user
-            conversation = mlayerClient.newConversation(options,Arrays.asList("Device"));
-        } catch (LayerConversationException e) {
-            // If a distinct conversation with the given user already exists, use that one instead
-//            conversation = e.getConversation();
-        }
+        if (mAuthenticationProvider == null) return this;
+        MyAuthenticationProvider.Credentials credentials = mAuthenticationProvider.getCredentials();
+        if (credentials == null) return this;
+        if (credentials.getAuthToken() == null) return this;
 
         if (!mFetching.compareAndSet(false, true)) return this;
+        new AsyncTask<MyAuthenticationProvider.Credentials, Void, Void>() {
+            protected Void doInBackground(MyAuthenticationProvider.Credentials... params) {
+                try {
+                    // Post request
+                   MyAuthenticationProvider.Credentials credentials = params[0];
+                    String url = "http://layer-identity-provider.herokuapp.com/users.json";
+                    HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+                    connection.setDoInput(true);
+                    connection.setDoOutput(false);
+                    connection.setRequestMethod("GET");
+                    connection.addRequestProperty("Content-Type", "application/json");
+                    connection.addRequestProperty("Accept", "application/json");
+                    connection.addRequestProperty("X_LAYER_APP_ID", credentials.getLayerAppId());
+                    if (credentials.getEmail() != null) {
+                        connection.addRequestProperty("X_AUTH_EMAIL", credentials.getEmail());
+                    }
+                    if (credentials.getAuthToken() != null) {
+                        connection.addRequestProperty("X_AUTH_TOKEN", credentials.getAuthToken());
+                    }
+
+                    // Handle failure
+                    int statusCode = connection.getResponseCode();
+                    if (statusCode != HttpURLConnection.HTTP_OK && statusCode != HttpURLConnection.HTTP_CREATED) {
+                        if (Log.isLoggable(Log.ERROR)) {
+                            Log.e(String.format("Got status %d when fetching participants", statusCode));
+                        }
+                        return null;
+                    }
+
+                    // Parse response
+                    InputStream in = new BufferedInputStream(connection.getInputStream());
+//                    String result = streamToString(in);
+                    String result = IOUtils.toString(in, "UTF-8");
+
+                    in.close();
+                    connection.disconnect();
+                    JSONArray json = new JSONArray(result);
+                    setParticipants(participantsFromJson(json));
+                } catch (Exception e) {
+                    if (Log.isLoggable(Log.ERROR)) Log.e(e.getMessage(), e);
+                } finally {
+                    mFetching.set(false);
+                }
+                return null;
+            }
+        }.execute(credentials);
+        return this;
+
+//        try {
+//            options = new ConversationOptions().distinct(true);
+//            // Try creating a new distinct conversation with the given user
+//            conversation = mlayerClient.newConversation(options,Arrays.asList("Device"));
+//        } catch (LayerConversationException e) {
+//            // If a distinct conversation with the given user already exists, use that one instead
+////            conversation = e.getConversation();
+//        }
+//
+//        if (!mFetching.compareAndSet(false, true)) return this;
 //        new AsyncTask<Void, Void, Void>() {
 //
 //
@@ -182,7 +246,7 @@ public class MyParticipantProvider implements ParticipantProvider {
 //                    connection.addRequestProperty("Accept", "application/json");
 //                    connection.addRequestProperty("X_LAYER_APP_ID", mlayerClient.getAppId().toString());
 //
-//                    android.util.Log.d( A,"inside");
+//
 //                    // Handle failure
 //                    int statusCode = connection.getResponseCode();
 //                    if (statusCode != HttpURLConnection.HTTP_OK && statusCode != HttpURLConnection.HTTP_CREATED) {
@@ -209,7 +273,7 @@ public class MyParticipantProvider implements ParticipantProvider {
 //                return null;
 //            }
 //        }.execute();
-        return this;
+//        return this;
 
     }
     private static List<MyParticipant> participantsFromJson(JSONArray participantArray) throws JSONException {
