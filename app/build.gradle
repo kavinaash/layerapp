@@ -23,16 +23,19 @@ android {
 repositories {
     maven { url "https://raw.githubusercontent.com/layerhq/releases-android/master/releases/" }
     maven { url "https://raw.githubusercontent.com/layerhq/Atlas-Android/master/releases/" }
+
     mavenCentral()
 }
 
 dependencies {
     compile 'com.android.support:appcompat-v7:+'
     compile 'com.google.android.gms:play-services-gcm:8.4.0'
-    compile 'com.layer.sdk:layer-sdk:0.19.5'
+    compile 'com.layer.sdk:layer-sdk:0.22.0'
     compile 'org.slf4j:slf4j-api:1.7.7'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.android.support:recyclerview-v7:23.1.1'
-    compile 'com.layer.atlas:layer-atlas:0.2.10'
+    compile 'com.layer.atlas:layer-atlas:0.3.0'
+
+
     compile 'org.apache.directory.studio:org.apache.commons.io:2.4'
 }

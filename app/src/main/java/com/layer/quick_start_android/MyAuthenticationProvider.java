@@ -115,7 +115,7 @@ public class MyAuthenticationProvider  implements AuthenticationProvider<MyAuthe
         }
         mPreferences.edit()
                 .putString("appId", credentials.getLayerAppId())
-                .putString("email", credentials.getEmail())
+                .putString("deviceId", credentials.getMydeviceId())
                 .putString("password", credentials.getPassword())
                 .putString("authToken", credentials.getAuthToken())
                 .apply();
@@ -125,14 +125,15 @@ public class MyAuthenticationProvider  implements AuthenticationProvider<MyAuthe
         if (!mPreferences.contains("appId")) return null;
         return new Credentials(
                 mPreferences.getString("appId", null),
-                mPreferences.getString("email", null),
+                mPreferences.getString("deviceId", null),
                 mPreferences.getString("password", null),
                 mPreferences.getString("authToken", null));
+
     }
 
     private void respondToChallenge(LayerClient layerClient, String nonce) {
         Credentials credentials = getCredentials();
-        if (credentials == null || credentials.getEmail() == null || (credentials.getPassword() == null && credentials.getAuthToken() == null) || credentials.getLayerAppId() == null) {
+        if (credentials == null || credentials.getMydeviceId() == null || (credentials.getPassword() == null && credentials.getAuthToken() == null) || credentials.getLayerAppId() == null) {
             if (Log.isLoggable(Log.WARN)) {
                 Log.w("No stored credentials to respond to challenge with");
             }
@@ -149,8 +150,8 @@ public class MyAuthenticationProvider  implements AuthenticationProvider<MyAuthe
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Accept", "application/json");
             connection.setRequestProperty("X_LAYER_APP_ID", credentials.getLayerAppId());
-            if (credentials.getEmail() != null) {
-                connection.setRequestProperty("X_AUTH_EMAIL", credentials.getEmail());
+            if (credentials.getMydeviceId() != null) {
+                connection.setRequestProperty("X_AUTH_EMAIL", credentials.getMydeviceId());
             }
             if (credentials.getAuthToken() != null) {
                 connection.setRequestProperty("X_AUTH_TOKEN", credentials.getAuthToken());
@@ -160,7 +161,7 @@ public class MyAuthenticationProvider  implements AuthenticationProvider<MyAuthe
             JSONObject rootObject = new JSONObject();
             JSONObject userObject = new JSONObject();
             rootObject.put("user", userObject);
-            userObject.put("email", credentials.getEmail());
+            userObject.put("deviceId", credentials.getMydeviceId());
             userObject.put("password", credentials.getPassword());
             rootObject.put("nonce", nonce);
 
@@ -174,7 +175,7 @@ public class MyAuthenticationProvider  implements AuthenticationProvider<MyAuthe
             int statusCode = connection.getResponseCode();
             if (statusCode != HttpURLConnection.HTTP_OK && statusCode != HttpURLConnection.HTTP_CREATED) {
                 String error = String.format("Got status %d when requesting authentication for '%s' with nonce '%s' from '%s'",
-                        statusCode, credentials.getEmail(), nonce, url);
+                        statusCode, credentials.getMydeviceId(), nonce, url);
                 if (Log.isLoggable(Log.ERROR)) Log.e(error);
                 if (mCallback != null) mCallback.onError(this, error);
                 return;
@@ -196,7 +197,7 @@ public class MyAuthenticationProvider  implements AuthenticationProvider<MyAuthe
 
             // Save provider's auth token and remove plain-text password.
             String authToken = json.optString("authentication_token", null);
-            Credentials authedCredentials = new Credentials(credentials.getLayerAppId(), credentials.getEmail(), null, authToken);
+            Credentials authedCredentials = new Credentials(credentials.getLayerAppId(), credentials.getMydeviceId(), null, authToken);
             replaceCredentials(authedCredentials);
 
             // Answer authentication challenge.
@@ -211,32 +212,32 @@ public class MyAuthenticationProvider  implements AuthenticationProvider<MyAuthe
     }
 
     public static class Credentials {
-        private final String mLayerAppId;
-        private final String myId;
-        private final String mPassword;
-        private final String mAuthToken;
+        private final String myLayerAppId;
+        private final String mydeviceId;
+        private final String myPassword;
+        private final String myAuthToken;
 
-        public Credentials(String layerAppId, String email, String password, String authToken) {
-            mLayerAppId = layerAppId == null ? null : (layerAppId.contains("/") ? layerAppId.substring(layerAppId.lastIndexOf("/") + 1) : layerAppId);
-            myId = email;
-            mPassword = password;
-            mAuthToken = authToken;
+        public Credentials(String layerAppId, String deviceId, String password, String authToken) {
+            myLayerAppId = layerAppId == null ? null : (layerAppId.contains("/") ? layerAppId.substring(layerAppId.lastIndexOf("/") + 1) : layerAppId);
+            mydeviceId = deviceId;
+            myPassword = password;
+            myAuthToken = authToken;
         }
 
-        public String getEmail() {
-            return myId;
+        public String getMydeviceId() {
+            return mydeviceId;
         }
 
         public String getPassword() {
-            return mPassword;
+            return myPassword;
         }
 
         public String getAuthToken() {
-            return mAuthToken;
+            return myAuthToken;
         }
 
         public String getLayerAppId() {
-            return mLayerAppId;
+            return myLayerAppId;
         }
     }
 }
